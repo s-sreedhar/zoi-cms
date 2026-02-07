@@ -7,7 +7,30 @@ export const Users: CollectionConfig = {
   },
   auth: true,
   fields: [
-    // Email added by default
-    // Add more fields as needed
+    {
+      name: 'displayName',
+      type: 'text',
+    },
+    {
+      name: 'role',
+      type: 'select',
+      options: [
+        { label: 'Super Admin', value: 'superadmin' },
+        { label: 'Customer', value: 'customer' },
+        { label: 'Instructor', value: 'instructor' },
+        { label: 'Admin', value: 'admin' },
+      ],
+      defaultValue: 'customer',
+      required: true,
+    },
+    {
+      name: 'phoneNumber',
+      type: 'text',
+    },
+    {
+      name: 'batch',
+      type: 'relationship',
+      relationTo: 'batches',
+    },
   ],
 }

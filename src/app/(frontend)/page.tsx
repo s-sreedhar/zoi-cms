@@ -21,38 +21,28 @@ export default async function HomePage() {
         <picture>
           <source srcSet="https://raw.githubusercontent.com/payloadcms/payload/main/packages/ui/src/assets/payload-favicon.svg" />
           <Image
-            alt="Payload Logo"
+            alt="Zoi CMS Logo"
             height={65}
             src="https://raw.githubusercontent.com/payloadcms/payload/main/packages/ui/src/assets/payload-favicon.svg"
             width={65}
           />
         </picture>
-        {!user && <h1>Welcome to your new project.</h1>}
-        {user && <h1>Welcome back, {user.email}</h1>}
+        <h1>Zoi Content Management System</h1>
+        <p>Manage Users, Courses, Batches, Workshops, and more.</p>
+        {!user && <p>Please log in to access the admin panel.</p>}
+        {user && <p>Welcome back, {user.email}</p>}
         <div className="links">
           <a
             className="admin"
             href={payloadConfig.routes.admin}
             rel="noopener noreferrer"
-            target="_blank"
           >
-            Go to admin panel
-          </a>
-          <a
-            className="docs"
-            href="https://payloadcms.com/docs"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Documentation
+            Access Admin Dashboard
           </a>
         </div>
       </div>
       <div className="footer">
-        <p>Update this page by editing</p>
-        <a className="codeLink" href={fileURL}>
-          <code>app/(frontend)/page.tsx</code>
-        </a>
+        <p>Powered by Nuat Labs</p>
       </div>
     </div>
   )
