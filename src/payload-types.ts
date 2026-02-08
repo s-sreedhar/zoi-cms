@@ -75,6 +75,11 @@ export interface Config {
     quizzes: Quiz;
     problems: Problem;
     sessions: Session;
+    feedback: Feedback;
+    leads: Lead;
+    'course-modules': CourseModule;
+    lessons: Lesson;
+    'course-progress': CourseProgress;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -90,6 +95,11 @@ export interface Config {
     quizzes: QuizzesSelect<false> | QuizzesSelect<true>;
     problems: ProblemsSelect<false> | ProblemsSelect<true>;
     sessions: SessionsSelect<false> | SessionsSelect<true>;
+    feedback: FeedbackSelect<false> | FeedbackSelect<true>;
+    leads: LeadsSelect<false> | LeadsSelect<true>;
+    'course-modules': CourseModulesSelect<false> | CourseModulesSelect<true>;
+    lessons: LessonsSelect<false> | LessonsSelect<true>;
+    'course-progress': CourseProgressSelect<false> | CourseProgressSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -162,47 +172,52 @@ export interface User {
 export interface Batch {
   id: number;
   name: string;
+  /**
+   * Generated from name (editable)
+   */
   slug: string;
-  description: string;
-  bio?: string | null;
-  hidden?: boolean | null;
+  course: number | Course;
+  description?: string | null;
+  status: 'upcoming' | 'open' | 'in_progress' | 'closed';
   startDate?: string | null;
+  endDate?: string | null;
   duration?: string | null;
-  price?: number | null;
+  price: number;
+  gst?: number | null;
   originalPrice?: number | null;
-  syllabus?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  curriculum?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  instructor?: string | null;
   offerTitle?: string | null;
   offerDetails?: string | null;
+  instructors?: (number | User)[] | null;
+  hidden?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "courses".
+ */
+export interface Course {
+  id: number;
+  title: string;
+  /**
+   * Generated from title (editable)
+   */
+  slug: string;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
   images?:
     | {
         image?: (number | null) | Media;
@@ -215,6 +230,7 @@ export interface Batch {
         id?: string | null;
       }[]
     | null;
+  hidden?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -239,74 +255,14 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "courses".
- */
-export interface Course {
-  id: number;
-  title: string;
-  slug: string;
-  description: string;
-  bio?: string | null;
-  offerTitle?: string | null;
-  offerDetails?: string | null;
-  startDate?: string | null;
-  duration?: string | null;
-  price?: number | null;
-  originalPrice?: number | null;
-  syllabus?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  curriculum?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  instructor?: string | null;
-  images?:
-    | {
-        image?: (number | null) | Media;
-        id?: string | null;
-      }[]
-    | null;
-  pdfs?:
-    | {
-        pdf?: (number | null) | Media;
-        id?: string | null;
-      }[]
-    | null;
-  hidden?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "workshops".
  */
 export interface Workshop {
   id: number;
   title: string;
+  /**
+   * Generated from title (editable)
+   */
   slug: string;
   description: string;
   startDate: string;
@@ -316,6 +272,7 @@ export interface Workshop {
   place?: string | null;
   presetCollege?: string | null;
   hidden?: boolean | null;
+  instructors?: (number | User)[] | null;
   images?:
     | {
         image?: (number | null) | Media;
@@ -410,43 +367,152 @@ export interface Problem {
  */
 export interface Session {
   id: number;
-  batch: number | Batch;
   title: string;
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
+  quiz: number | Quiz;
+  host: number | User;
+  status: 'WAITING' | 'ACTIVE' | 'FINISHED';
+  mode: 'INTERACTIVE' | 'DIY';
+  totalTimeLimit?: number | null;
+  endTime?: string | null;
+  startedAt?: string | null;
+  endedAt?: string | null;
+  currentQuestionIndex?: number | null;
+  /**
+   * Map of userId to { name, score }
+   */
+  participants?:
+    | {
         [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  date?: string | null;
-  videoUrl?: string | null;
-  videoOriginalUrl?: string | null;
-  processingStatus?: ('PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED') | null;
-  processingError?: string | null;
-  attachments?:
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "feedback".
+ */
+export interface Feedback {
+  id: number;
+  name: string;
+  event: string;
+  rating: number;
+  improvement?: string | null;
+  interests?:
     | {
-        name?: string | null;
-        file?: (number | null) | Media;
-        type?: ('pdf' | 'doc' | 'image' | 'other') | null;
+        interest?: string | null;
         id?: string | null;
       }[]
     | null;
-  isPublished?: boolean | null;
-  tags?:
+  additionalComments?: string | null;
+  source?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "leads".
+ */
+export interface Lead {
+  id: number;
+  name: string;
+  phone?: string | null;
+  source?: string | null;
+  status?: ('New' | 'Contacted' | 'Interested' | 'Converted' | 'Closed') | null;
+  notes?: string | null;
+  place?: string | null;
+  leadHistory?:
     | {
-        tag?: string | null;
+        action?: string | null;
+        date?: string | null;
+        details?: string | null;
         id?: string | null;
       }[]
     | null;
+  read?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "course-modules".
+ */
+export interface CourseModule {
+  id: number;
+  title: string;
+  description?: string | null;
+  course: number | Course;
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lessons".
+ */
+export interface Lesson {
+  id: number;
+  title: string;
+  module: number | CourseModule;
+  order?: number | null;
+  topics?:
+    | {
+        title: string;
+        content?:
+          | (
+              | {
+                  title?: string | null;
+                  videoSource?: ('bunny' | 'youtube' | 'custom') | null;
+                  bunnyVideoId?: string | null;
+                  url?: string | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'videoBlock';
+                }
+              | {
+                  quiz: number | Quiz;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'quizBlock';
+                }
+              | {
+                  title?: string | null;
+                  file: number | Media;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'pdfBlock';
+                }
+            )[]
+          | null;
+        resources?:
+          | {
+              title?: string | null;
+              url?: string | null;
+              file?: (number | null) | Media;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "course-progress".
+ */
+export interface CourseProgress {
+  id: number;
+  user: number | User;
+  course?: (number | null) | Course;
+  lesson: number | Lesson;
+  status?: ('NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED') | null;
+  completedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -505,6 +571,26 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'sessions';
         value: number | Session;
+      } | null)
+    | ({
+        relationTo: 'feedback';
+        value: number | Feedback;
+      } | null)
+    | ({
+        relationTo: 'leads';
+        value: number | Lead;
+      } | null)
+    | ({
+        relationTo: 'course-modules';
+        value: number | CourseModule;
+      } | null)
+    | ({
+        relationTo: 'lessons';
+        value: number | Lesson;
+      } | null)
+    | ({
+        relationTo: 'course-progress';
+        value: number | CourseProgress;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -600,16 +686,6 @@ export interface CoursesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   description?: T;
-  bio?: T;
-  offerTitle?: T;
-  offerDetails?: T;
-  startDate?: T;
-  duration?: T;
-  price?: T;
-  originalPrice?: T;
-  syllabus?: T;
-  curriculum?: T;
-  instructor?: T;
   images?:
     | T
     | {
@@ -633,30 +709,19 @@ export interface CoursesSelect<T extends boolean = true> {
 export interface BatchesSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
+  course?: T;
   description?: T;
-  bio?: T;
-  hidden?: T;
+  status?: T;
   startDate?: T;
+  endDate?: T;
   duration?: T;
   price?: T;
+  gst?: T;
   originalPrice?: T;
-  syllabus?: T;
-  curriculum?: T;
-  instructor?: T;
   offerTitle?: T;
   offerDetails?: T;
-  images?:
-    | T
-    | {
-        image?: T;
-        id?: T;
-      };
-  pdfs?:
-    | T
-    | {
-        pdf?: T;
-        id?: T;
-      };
+  instructors?: T;
+  hidden?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -675,6 +740,7 @@ export interface WorkshopsSelect<T extends boolean = true> {
   place?: T;
   presetCollege?: T;
   hidden?: T;
+  instructors?: T;
   images?:
     | T
     | {
@@ -747,29 +813,139 @@ export interface ProblemsSelect<T extends boolean = true> {
  * via the `definition` "sessions_select".
  */
 export interface SessionsSelect<T extends boolean = true> {
-  batch?: T;
+  title?: T;
+  quiz?: T;
+  host?: T;
+  status?: T;
+  mode?: T;
+  totalTimeLimit?: T;
+  endTime?: T;
+  startedAt?: T;
+  endedAt?: T;
+  currentQuestionIndex?: T;
+  participants?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "feedback_select".
+ */
+export interface FeedbackSelect<T extends boolean = true> {
+  name?: T;
+  event?: T;
+  rating?: T;
+  improvement?: T;
+  interests?:
+    | T
+    | {
+        interest?: T;
+        id?: T;
+      };
+  additionalComments?: T;
+  source?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "leads_select".
+ */
+export interface LeadsSelect<T extends boolean = true> {
+  name?: T;
+  phone?: T;
+  source?: T;
+  status?: T;
+  notes?: T;
+  place?: T;
+  leadHistory?:
+    | T
+    | {
+        action?: T;
+        date?: T;
+        details?: T;
+        id?: T;
+      };
+  read?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "course-modules_select".
+ */
+export interface CourseModulesSelect<T extends boolean = true> {
   title?: T;
   description?: T;
-  date?: T;
-  videoUrl?: T;
-  videoOriginalUrl?: T;
-  processingStatus?: T;
-  processingError?: T;
-  attachments?:
+  course?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lessons_select".
+ */
+export interface LessonsSelect<T extends boolean = true> {
+  title?: T;
+  module?: T;
+  order?: T;
+  topics?:
     | T
     | {
-        name?: T;
-        file?: T;
-        type?: T;
+        title?: T;
+        content?:
+          | T
+          | {
+              videoBlock?:
+                | T
+                | {
+                    title?: T;
+                    videoSource?: T;
+                    bunnyVideoId?: T;
+                    url?: T;
+                    id?: T;
+                    blockName?: T;
+                  };
+              quizBlock?:
+                | T
+                | {
+                    quiz?: T;
+                    id?: T;
+                    blockName?: T;
+                  };
+              pdfBlock?:
+                | T
+                | {
+                    title?: T;
+                    file?: T;
+                    id?: T;
+                    blockName?: T;
+                  };
+            };
+        resources?:
+          | T
+          | {
+              title?: T;
+              url?: T;
+              file?: T;
+              id?: T;
+            };
         id?: T;
       };
-  isPublished?: T;
-  tags?:
-    | T
-    | {
-        tag?: T;
-        id?: T;
-      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "course-progress_select".
+ */
+export interface CourseProgressSelect<T extends boolean = true> {
+  user?: T;
+  course?: T;
+  lesson?: T;
+  status?: T;
+  completedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

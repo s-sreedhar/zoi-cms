@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import formatSlug from '../utils/formatSlug'
 
 export const Batch: CollectionConfig = {
     slug: 'batches',
@@ -14,51 +15,77 @@ export const Batch: CollectionConfig = {
         {
             name: 'slug',
             type: 'text',
-            required: true,
             unique: true,
+            required: true,
+            admin: {
+                position: 'sidebar',
+                description: 'Generated from name (editable)',
+            },
+            hooks: {
+                beforeValidate: [formatSlug('name')],
+            },
+        },
+        {
+            name: 'course',
+            type: 'relationship',
+            relationTo: 'courses',
+            required: true,
+            admin: {
+                position: 'sidebar',
+            },
         },
         {
             name: 'description',
             type: 'textarea',
+        },
+        {
+            name: 'status',
+            type: 'select',
+            options: [
+                { label: 'Upcoming', value: 'upcoming' },
+                { label: 'Open', value: 'open' },
+                { label: 'In Progress', value: 'in_progress' },
+                { label: 'Closed', value: 'closed' },
+            ],
+            defaultValue: 'upcoming',
             required: true,
-        },
-        {
-            name: 'bio',
-            type: 'textarea',
-        },
-        {
-            name: 'hidden',
-            type: 'checkbox',
-            defaultValue: false,
         },
         {
             name: 'startDate',
             type: 'date',
+            admin: {
+                date: {
+                    pickerAppearance: 'dayAndTime',
+                },
+            },
+        },
+        {
+            name: 'endDate',
+            type: 'date',
+            admin: {
+                date: {
+                    pickerAppearance: 'dayAndTime',
+                },
+            },
         },
         {
             name: 'duration',
-            type: 'text',
+            type: 'text', // e.g., "6 Weeks"
         },
         {
             name: 'price',
             type: 'number',
+            required: true,
+        },
+        {
+            name: 'gst',
+            type: 'number',
+            label: 'GST (%)',
+            defaultValue: 18,
         },
         {
             name: 'originalPrice',
             type: 'number',
-        },
-        {
-            name: 'syllabus',
-            type: 'richText',
-        },
-        {
-            name: 'curriculum',
-            type: 'richText',
-        },
-        {
-            name: 'instructor',
-            type: 'text',
-            defaultValue: 'Nuat Labs',
         },
         {
             name: 'offerTitle',
@@ -69,26 +96,18 @@ export const Batch: CollectionConfig = {
             type: 'textarea',
         },
         {
-            name: 'images',
-            type: 'array',
-            fields: [
-                {
-                    name: 'image',
-                    type: 'upload',
-                    relationTo: 'media',
-                },
-            ],
+            name: 'instructors',
+            type: 'relationship',
+            relationTo: 'users',
+            hasMany: true,
+            filterOptions: {
+                role: { equals: 'instructor' },
+            },
         },
         {
-            name: 'pdfs',
-            type: 'array',
-            fields: [
-                {
-                    name: 'pdf',
-                    type: 'upload',
-                    relationTo: 'media',
-                },
-            ],
+            name: 'hidden',
+            type: 'checkbox',
+            defaultValue: false,
         },
     ],
 }

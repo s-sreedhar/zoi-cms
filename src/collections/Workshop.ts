@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import formatSlug from '../utils/formatSlug'
 
 export const Workshop: CollectionConfig = {
     slug: 'workshops',
@@ -14,8 +15,15 @@ export const Workshop: CollectionConfig = {
         {
             name: 'slug',
             type: 'text',
-            required: true,
             unique: true,
+            required: true,
+            admin: {
+                position: 'sidebar',
+                description: 'Generated from title (editable)',
+            },
+            hooks: {
+                beforeValidate: [formatSlug('title')],
+            },
         },
         {
             name: 'description',
@@ -52,6 +60,18 @@ export const Workshop: CollectionConfig = {
             name: 'hidden',
             type: 'checkbox',
             defaultValue: false,
+        },
+        {
+            name: 'instructors',
+            type: 'relationship',
+            relationTo: 'users',
+            hasMany: true,
+            filterOptions: {
+                role: { equals: 'instructor' },
+            },
+            admin: {
+                position: 'sidebar',
+            },
         },
         {
             name: 'images',

@@ -7,84 +7,71 @@ export const Session: CollectionConfig = {
     },
     fields: [
         {
-            name: 'batch',
-            type: 'relationship',
-            relationTo: 'batches',
-            required: true,
-        },
-        {
             name: 'title',
             type: 'text',
             required: true,
         },
         {
-            name: 'description',
-            type: 'richText',
+            name: 'quiz',
+            type: 'relationship',
+            relationTo: 'quizzes',
+            required: true,
         },
         {
-            name: 'date',
+            name: 'host',
+            type: 'relationship',
+            relationTo: 'users',
+            required: true,
+        },
+        {
+            name: 'status',
+            type: 'select',
+            options: [
+                { label: 'Waiting', value: 'WAITING' },
+                { label: 'Active', value: 'ACTIVE' },
+                { label: 'Finished', value: 'FINISHED' },
+            ],
+            defaultValue: 'WAITING',
+            required: true,
+        },
+        {
+            name: 'mode',
+            type: 'select',
+            options: [
+                { label: 'Interactive', value: 'INTERACTIVE' },
+                { label: 'DIY', value: 'DIY' },
+            ],
+            defaultValue: 'DIY',
+            required: true,
+        },
+        {
+            name: 'totalTimeLimit',
+            type: 'number',
+            label: 'Total Time Limit (Seconds)',
+        },
+        {
+            name: 'endTime',
+            type: 'date', // Changed to date for better CMS handling, though backend used number timestamp
+        },
+        {
+            name: 'startedAt',
             type: 'date',
         },
         {
-            name: 'videoUrl',
-            type: 'text',
-            label: 'Video URL (HLS)',
+            name: 'endedAt',
+            type: 'date',
         },
         {
-            name: 'videoOriginalUrl',
-            type: 'text',
-            label: 'Original Video URL',
+            name: 'currentQuestionIndex',
+            type: 'number',
+            defaultValue: -1,
         },
         {
-            name: 'processingStatus',
-            type: 'select',
-            options: [
-                { label: 'Pending', value: 'PENDING' },
-                { label: 'Processing', value: 'PROCESSING' },
-                { label: 'Completed', value: 'COMPLETED' },
-                { label: 'Failed', value: 'FAILED' },
-            ],
-            defaultValue: 'PENDING',
-        },
-        {
-            name: 'processingError',
-            type: 'text',
-        },
-        {
-            name: 'attachments',
-            type: 'array',
-            fields: [
-                {
-                    name: 'name',
-                    type: 'text',
-                },
-                {
-                    name: 'file',
-                    type: 'upload',
-                    relationTo: 'media',
-                },
-                {
-                    name: 'type',
-                    type: 'select',
-                    options: ['pdf', 'doc', 'image', 'other'],
-                    defaultValue: 'other',
-                },
-            ],
-        },
-        {
-            name: 'isPublished',
-            type: 'checkbox',
-            defaultValue: false,
-        },
-        {
-            name: 'tags', // Added tags as it was in the model
-            type: 'array',
-            fields: [
-                {
-                    name: 'tag',
-                    type: 'text',
-                },
-            ],
+            name: 'participants',
+            type: 'json', // Using JSON for the structured participant map
+            admin: {
+                description: 'Map of userId to { name, score }',
+            },
         },
     ],
 }

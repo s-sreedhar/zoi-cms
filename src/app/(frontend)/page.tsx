@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { getPayload } from 'payload'
 import React from 'react'
 import { fileURLToPath } from 'url'
+import { redirect } from 'next/navigation'
 
 import config from '@/payload.config'
 import './styles.css'
@@ -14,6 +15,10 @@ export default async function HomePage() {
   const { user } = await payload.auth({ headers })
 
   const fileURL = `vscode://file/${fileURLToPath(import.meta.url)}`
+
+  if (!user) {
+    redirect('/admin/login')
+  }
 
   return (
     <div className="home">
@@ -29,7 +34,6 @@ export default async function HomePage() {
         </picture>
         <h1>Zoi Content Management System</h1>
         <p>Manage Users, Courses, Batches, Workshops, and more.</p>
-        {!user && <p>Please log in to access the admin panel.</p>}
         {user && <p>Welcome back, {user.email}</p>}
         <div className="links">
           <a

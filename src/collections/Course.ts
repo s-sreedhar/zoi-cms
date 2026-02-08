@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import formatSlug from '../utils/formatSlug'
 
 export const Course: CollectionConfig = {
     slug: 'courses',
@@ -15,53 +16,19 @@ export const Course: CollectionConfig = {
             name: 'slug',
             type: 'text',
             required: true,
-            unique: true, // Payload handles uniqueness
+            unique: true,
+            admin: {
+                position: 'sidebar',
+                description: 'Generated from title (editable)',
+            },
+            hooks: {
+                beforeValidate: [formatSlug('title')],
+            },
         },
         {
             name: 'description',
-            type: 'textarea',
+            type: 'richText',
             required: true,
-        },
-        {
-            name: 'bio',
-            type: 'textarea',
-        },
-        {
-            name: 'offerTitle',
-            type: 'text',
-        },
-        {
-            name: 'offerDetails',
-            type: 'textarea',
-        },
-        {
-            name: 'startDate',
-            type: 'date',
-        },
-        {
-            name: 'duration',
-            type: 'text',
-        },
-        {
-            name: 'price',
-            type: 'number',
-        },
-        {
-            name: 'originalPrice',
-            type: 'number',
-        },
-        {
-            name: 'syllabus',
-            type: 'richText',
-        },
-        {
-            name: 'curriculum',
-            type: 'richText',
-        },
-        {
-            name: 'instructor',
-            type: 'text',
-            defaultValue: 'Nuat Labs',
         },
         {
             name: 'images',
