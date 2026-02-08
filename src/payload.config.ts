@@ -1,3 +1,4 @@
+// payload.config.ts
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
@@ -8,11 +9,12 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
-
+import { Videos } from './collections/Videos'
 import { Course } from './collections/Course'
 import { Batch } from './collections/Batch'
 import { Workshop } from './collections/Workshop'
 import { Quiz } from './collections/Quiz'
+import { DailyQuiz } from './collections/DailyQuiz'
 import { Problem } from './collections/Problem'
 import { Session } from './collections/Session'
 import { Leads } from './collections/Leads'
@@ -38,7 +40,7 @@ export default buildConfig({
       },
     },
   },
-  collections: [Users, Media, Course, Batch, Workshop, Quiz, Problem, Session, Feedback, Leads, CourseModule, Lesson, CourseProgress],
+  collections: [Users, Media, Videos, Course, Batch, Workshop, Quiz, DailyQuiz, Problem, Session, Feedback, Leads, CourseModule, Lesson, CourseProgress],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

@@ -39,8 +39,8 @@ export const Quiz: CollectionConfig = {
                             defaultValue: 'MCQ',
                         },
                         {
-                            name: 'text',
-                            type: 'textarea',
+                            name: 'richText',
+                            type: 'richText',
                             required: true,
                         },
                         {
@@ -63,13 +63,21 @@ export const Quiz: CollectionConfig = {
                         },
                         {
                             name: 'correctAnswers',
-                            type: 'array',
-                            fields: [
-                                {
-                                    name: 'answer',
-                                    type: 'text',
+                            type: 'text',
+                            hasMany: true,
+                            required: true,
+                            admin: {
+                                components: {
+                                    Field: '/components/CorrectAnswerSelect#CorrectAnswerSelect',
                                 },
-                            ],
+                            },
+                        },
+                        {
+                            name: 'explanation',
+                            type: 'richText',
+                            admin: {
+                                description: 'Shown after the student answers.',
+                            },
                         },
                         {
                             name: 'points',

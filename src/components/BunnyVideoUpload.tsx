@@ -3,12 +3,86 @@
 import React, { useState, useEffect } from 'react'
 import { useField } from '@payloadcms/ui'
 
-export const BunnyVideoUpload: React.FC = () => {
-    const { value, setValue } = useField<string>({ path: 'bunnyVideoId' })
+type Props = { path: string }
+
+export const BunnyVideoUpload: React.FC<Props> = ({ path }) => {
+    const { value, setValue } = useField<string>({ path })
     const [uploading, setUploading] = useState(false)
     const [progress, setProgress] = useState(0)
     const [error, setError] = useState<string | null>(null)
     const [uploadMessage, setUploadMessage] = useState<string | null>(null)
+    const [libraryId, setLibraryId] = useState<string | null>(null)
+    const [configError, setConfigError] = useState<boolean>(false)
+    const [processingStatus, setProcessingStatus] = useState<number | null>(null) // 0-2=Processing, 3=Finished
+    const [encodeProgress, setEncodeProgress] = useState<number>(0)
+
+    // Debug log
+    useEffect(() => {
+        console.log('[BunnyVideoUpload] Mounted with path:', path, 'Value:', value)
+    }, [path, value])
+
+    // Fetch config on mount
+    useEffect(() => {
+        const fetchConfig = async () => {
+            try {
+                const res = await fetch('/api/bunny/config')
+                if (res.ok) {
+                    const data = await res.json()
+                    if (data.libraryId) {
+                        setLibraryId(String(data.libraryId)) // Ensure string
+                    } else {
+                        console.warn('[BunnyVideoUpload] No libraryId returned from config')
+                        setConfigError(true)
+                    }
+                } else {
+                    console.error('[BunnyVideoUpload] Config fetch failed:', res.status)
+                    setConfigError(true)
+                }
+            } catch (e) {
+                console.error("[BunnyVideoUpload] Failed to fetch library ID", e)
+                setConfigError(true)
+            }
+        }
+        fetchConfig()
+    }, [])
+
+    // Poll status if value exists and not finished
+    useEffect(() => {
+        let interval: NodeJS.Timeout
+
+        const checkStatus = async () => {
+            if (!value) return
+
+            try {
+                const res = await fetch(`/api/bunny/status?videoId=${value}`)
+                if (res.ok) {
+                    const data = await res.json()
+                    // Status: 0=Created, 1=Uploaded, 2=Processing, 3=Transcoding, 4=Finished, 5=Error, 6=UploadFailed
+                    // Actually Bunny API: 0=Queued, 1=Processing, 2=Encoding, 3=Finished, 4=Failed
+                    // Let's trust the data.status
+                    setProcessingStatus(data.status)
+                    setEncodeProgress(data.encodeProgress || 0)
+
+                    if (data.status === 3 || data.status === 4) { // Finished or static (legacy)
+                        if (interval) clearInterval(interval)
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to check status", e)
+            }
+        }
+
+        if (value) {
+            checkStatus()
+            // Poll every 5s if we don't know status or it's processing (< 3)
+            interval = setInterval(checkStatus, 5000)
+        }
+
+        return () => {
+            if (interval) clearInterval(interval)
+        }
+    }, [value])
+
 
     const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -18,9 +92,17 @@ export const BunnyVideoUpload: React.FC = () => {
         setError(null)
         setUploadMessage("Initializing upload...")
         setProgress(0)
+        setProcessingStatus(0) // Reset to queued
+
+        // Debug: Ensure path is valid before upload
+        if (!path) {
+            setError("Component Error: Missing field path. Cannot save.")
+            setUploading(false)
+            return
+        }
 
         try {
-            // 1. Get presigned URL and video ID from our API
+            // 1. Get presigned URL and video ID
             const res = await fetch('/api/bunny/upload', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -32,126 +114,134 @@ export const BunnyVideoUpload: React.FC = () => {
                 throw new Error(err.error || 'Failed to get upload URL')
             }
 
-            const { videoId, authorizationSignature, expirationTime, libraryId } = await res.json()
+            const { videoId, authorizationSignature, libraryId: libId } = await res.json()
+            if (libId) setLibraryId(String(libId))
 
             setUploadMessage("Uploading to Bunny.net...")
 
-            // 2. Upload to Bunny.net using the correct endpoint and signature
-            // API Reference: https://docs.bunny.net/reference/video-upload
-            // Endpoint matches: PUT /library/{libraryId}/videos/{videoId}
-            // Headers: AccessKey: {apiKey} (In our case, we need to use the signature if possible or presigned URL)
+            // 2. Upload using XHR for progress tracking
+            const xhr = new XMLHttpRequest()
+            xhr.open('PUT', `https://video.bunnycdn.com/library/${libId}/videos/${videoId}`, true)
+            xhr.setRequestHeader('AccessKey', authorizationSignature)
+            xhr.setRequestHeader('Content-Type', 'application/octet-stream')
+            xhr.setRequestHeader('Accept', 'application/json')
 
-            // NOTE: Direct upload from client with just SHA256 signature is tricky for Bunny Stream 
-            // as it typically expects the API Key in the 'AccessKey' header for this endpoint.
-            // However, presigned uploads usually go to a distinct URL or require specific query params.
-            // If the API route is proxying, it's safer. But for large files, direct is best.
-
-            // Let's attempt the standard upload endpoint with the signature as AccessKey if supported,
-            // OR usually for client-side, we might use the 'tus' protocol or a specific direct upload URL if Bunny supports it via signature.
-
-            // Checking Bunny Docs for "Direct Upload" without exposing API Key:
-            // "You can generate a presigned URL... The expiration time and signature should be passed as query parameters."
-            // But usually this refers to *viewing*.
-
-            // For *uploading*, Bunny Stream offers `Create Video` then `Upload Video`.
-            // To do this securely from client config, normally we proxy. 
-            // BUT for this task, let's try the fetch to our proxy route if direct isn't straightforward, 
-            // OR assume the user will configure the API route to handle the `PUT` to Bunny if we don't want to expose keys.
-            // Actually, for a CMS, it's often acceptable to proxy the upload through the Next.js API route 
-            // if files aren't massive, OR use a presigned upload URL if the provider supports it.
-
-            // Bunny Stream doesn't have a AWS S3-style "presigned PUT URL" out of the box easily documented for the *Creation* step without API key.
-            // However, Tus (resumable) is supported and recommended.
-
-            // SIMPLIFICATION:
-            // We will do the upload PROXY via our server for now to hide the key, 
-            // OR if the user provides the Write-Only API Key (if Bunny has scopes), we could use it.
-            // Given constraints, I will implement a client-side upload interacting with the server to proxy the PUT 
-            // OR just ask the server to do it? No, browser has the file.
-
-            // Let's use the provided `authorizationSignature` relative to the library/video if valid.
-            // If not, we'll try to pass the file stream to the local API? No, vercel/serverless limits body size.
-
-            // REVISION: The safest way without complex TUS setup right now is:
-            // 1. Server creates video object (POST to Bunny) -> returns video ID + Authorization header/signature.
-            // 2. Client PUTs to Bunny using that temporary signature if allowed?
-            // Actually, Bunny `AccessKey` header IS the API key. 
-
-            // WORKAROUND: We will assume we can use the API key if 'Server Side' (Payload is admin). 
-            // BUT this component is client-side.
-            // We'll update the component to `fetch` to our `/api/bunny/upload?videoId=...` with the file body? 
-            // Payload/Next.js body limit might be an issue (4MB default).
-
-            // BETTER APPROACH: TUS.
-            // But TUS is complex to implement in a simple file.
-
-            // FALLBACK TO SIMPLE UPLOAD:
-            // If we assume this is an admin panel for trusted users, maybe we can't hide the key easily 
-            // without a proxy that handles streaming.
-            // Let's implement the API route to Generate a Presigned **Upload** URL if Bunny supports it (it does via 'Presigned Upload' params).
-
-            // Assuming the API returns a construced `presignedUrl` that is valid for PUT.
-
-            const uploadRes = await fetch(`https://video.bunnycdn.com/library/${libraryId}/videos/${videoId}`, {
-                method: 'PUT',
-                headers: {
-                    'AccessKey': authorizationSignature, // Expecting SHA256 signature or valid auth
-                    'Content-Type': 'application/octet-stream',
-                    'Accept': 'application/json'
-                },
-                body: file
-            });
-
-            if (!uploadRes.ok) {
-                // If direct upload fails with signature, we might need the actual Header Key.
-                // In that case, we can't do it purely client side without exposing key or proxying.
-                // We'll assume the API route returns a usable signature or we might fail.
-                // Let's try to proceed.
-                throw new Error('Upload request failed')
+            xhr.upload.onprogress = (event) => {
+                if (event.lengthComputable) {
+                    const percentComplete = (event.loaded / event.total) * 100
+                    setProgress(Math.round(percentComplete))
+                }
             }
 
-            // 3. Update field
-            setValue(videoId)
-            setUploadMessage("Upload complete!")
+            xhr.onload = () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    console.log('[BunnyVideoUpload] Upload success. Setting value:', videoId)
+                    setValue(videoId)
+                    setUploadMessage("Upload complete! Processing video...")
+                    setUploading(false)
+                    setProcessingStatus(1) // Assuming processing starts
+                } else {
+                    setError('Upload failed: ' + xhr.statusText)
+                    setUploading(false)
+                }
+            }
+
+            xhr.onerror = () => {
+                setError('Network error during upload')
+                setUploading(false)
+            }
+
+            xhr.send(file)
+
         } catch (err: any) {
             console.error(err)
             setError(err.message || "An unexpected error occurred")
-            setUploadMessage(null)
-        } finally {
             setUploading(false)
         }
     }
 
+    const isProcessing = processingStatus !== null && processingStatus < 3
+    const isError = processingStatus === 5 || processingStatus === 6
+
     return (
         <div className="field-type">
-            <label className="field-label">Bunny Video ID</label>
-            <div style={{ marginBottom: '10px' }}>
-                <input
-                    type="text"
-                    value={value || ''}
-                    onChange={(e) => setValue(e.target.value)}
-                    className="full-width"
-                    placeholder="Video ID"
-                    readOnly
-                    style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
-                />
-            </div>
+            <label className="field-label">
+                Bunny Video ID
+                {configError && <span style={{ color: 'red', marginLeft: '10px' }}>(Config Error: Library ID Missing)</span>}
+            </label>
 
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                <input
-                    type="file"
-                    accept="video/*"
-                    onChange={handleUpload}
-                    disabled={uploading}
-                />
-                {uploading && <span>{uploadMessage || 'Processing...'}</span>}
-            </div>
-
-            {error && <div style={{ color: 'red', marginTop: '5px' }}>{error}</div>}
-
+            {/* Logic to show existing value or preview */}
             {value && (
-                <div style={{ marginTop: '10px' }}>
-                    {/* Preview could go here */}
+                <div style={{ marginBottom: '15px' }}>
+                    <div style={{ marginBottom: '5px', fontSize: '12px', color: '#666' }}>
+                        ID: {value}
+                        {isProcessing && <span style={{ color: 'orange', marginLeft: '10px' }}>Processing ({encodeProgress}%)</span>}
+                        {processingStatus === 3 && <span style={{ color: 'green', marginLeft: '10px' }}>Ready</span>}
+                        {isError && <span style={{ color: 'red', marginLeft: '10px' }}>Processing Failed</span>}
+                    </div>
+
+                    {libraryId ? (
+                        <div style={{ position: 'relative', paddingTop: '56.25%', background: '#000', borderRadius: '8px', overflow: 'hidden' }}>
+                            {isProcessing ? (
+                                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', flexDirection: 'column' }}>
+                                    <div style={{ marginBottom: '10px' }}>Video is processing...</div>
+                                    <div style={{ width: '50%', height: '4px', background: '#333', borderRadius: '2px' }}>
+                                        <div style={{ width: `${encodeProgress}%`, height: '100%', background: '#4caf50', transition: 'width 0.5s' }}></div>
+                                    </div>
+                                    <div style={{ marginTop: '5px', fontSize: '12px', color: '#aaa' }}>This may take a few minutes.</div>
+                                </div>
+                            ) : (
+                                <iframe
+                                    src={`https://iframe.mediadelivery.net/embed/${libraryId}/${value}?autoplay=false&loop=false&muted=false&preload=true`}
+                                    loading="lazy"
+                                    style={{ border: 'none', position: 'absolute', top: 0, height: '100%', width: '100%' }}
+                                    allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                                    allowFullScreen={true}
+                                ></iframe>
+                            )}
+                        </div>
+                    ) : (
+                        <div style={{ padding: '20px', background: '#f0f0f0', borderRadius: '4px', textAlign: 'center' }}>
+                            {configError ? "Cannot load preview (Library ID missing)" : "Loading preview..."}
+                        </div>
+                    )}
+                    <button
+                        type="button"
+                        onClick={(e) => { e.preventDefault(); setValue(null) }}
+                        style={{ marginTop: '10px', padding: '5px 10px', background: '#ff4d4f', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                        Remove / Replace Video
+                    </button>
+                </div>
+            )}
+
+            {!value && (
+                <div style={{ border: '2px dashed #ccc', padding: '20px', borderRadius: '8px', textAlign: 'center' }}>
+                    <input
+                        type="file"
+                        accept="video/*"
+                        onChange={handleUpload}
+                        disabled={uploading}
+                        style={{ display: 'none' }}
+                        id={`bunny-upload-${path}`}
+                    />
+                    <label
+                        htmlFor={`bunny-upload-${path}`}
+                        style={{ display: 'inline-block', padding: '10px 20px', background: '#333', color: '#fff', borderRadius: '4px', cursor: 'pointer', marginBottom: '10px' }}
+                    >
+                        {uploading ? 'Uploading...' : 'Select Video to Upload'}
+                    </label>
+
+                    {uploading && (
+                        <div style={{ marginTop: '15px' }}>
+                            <div style={{ marginBottom: '5px' }}>{uploadMessage} ({progress}%)</div>
+                            <div style={{ width: '100%', height: '10px', background: '#eee', borderRadius: '5px', overflow: 'hidden' }}>
+                                <div style={{ height: '100%', background: '#4caf50', width: `${progress}%`, transition: 'width 0.2s' }}></div>
+                            </div>
+                        </div>
+                    )}
+
+                    {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
                 </div>
             )}
         </div>

@@ -69,10 +69,12 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    videos: Video;
     courses: Course;
     batches: Batch;
     workshops: Workshop;
     quizzes: Quiz;
+    'daily-quizzes': DailyQuizz;
     problems: Problem;
     sessions: Session;
     feedback: Feedback;
@@ -89,10 +91,12 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    videos: VideosSelect<false> | VideosSelect<true>;
     courses: CoursesSelect<false> | CoursesSelect<true>;
     batches: BatchesSelect<false> | BatchesSelect<true>;
     workshops: WorkshopsSelect<false> | WorkshopsSelect<true>;
     quizzes: QuizzesSelect<false> | QuizzesSelect<true>;
+    'daily-quizzes': DailyQuizzesSelect<false> | DailyQuizzesSelect<true>;
     problems: ProblemsSelect<false> | ProblemsSelect<true>;
     sessions: SessionsSelect<false> | SessionsSelect<true>;
     feedback: FeedbackSelect<false> | FeedbackSelect<true>;
@@ -176,7 +180,7 @@ export interface Batch {
    * Generated from name (editable)
    */
   slug: string;
-  course: number | Course;
+  course: (number | Course)[];
   description?: string | null;
   status: 'upcoming' | 'open' | 'in_progress' | 'closed';
   startDate?: string | null;
@@ -255,6 +259,17 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos".
+ */
+export interface Video {
+  id: number;
+  title: string;
+  bunnyVideoId: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "workshops".
  */
 export interface Workshop {
@@ -300,7 +315,21 @@ export interface Quiz {
   questions?:
     | {
         type?: ('MCQ' | 'MSQ' | 'TEXT' | 'NUMBER') | null;
-        text: string;
+        richText: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
         image?: (number | null) | Media;
         options?:
           | {
@@ -308,12 +337,25 @@ export interface Quiz {
               id?: string | null;
             }[]
           | null;
-        correctAnswers?:
-          | {
-              answer?: string | null;
-              id?: string | null;
-            }[]
-          | null;
+        correctAnswers: string[];
+        /**
+         * Shown after the student answers.
+         */
+        explanation?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
         points?: number | null;
         timeLimit?: number | null;
         id?: string | null;
@@ -321,6 +363,75 @@ export interface Quiz {
         blockType: 'question';
       }[]
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "daily-quizzes".
+ */
+export interface DailyQuizz {
+  id: number;
+  date: string;
+  batch: number | Batch;
+  module: number | CourseModule;
+  question: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  type: 'MCQ' | 'MSQ' | 'TEXT' | 'NUMBER';
+  options?:
+    | {
+        option: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Select the correct option(s).
+   */
+  correctAnswers: string[];
+  /**
+   * Shown after the student answers.
+   */
+  explanation?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "course-modules".
+ */
+export interface CourseModule {
+  id: number;
+  title: string;
+  description?: string | null;
+  course: number | Course;
+  order?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -439,19 +550,6 @@ export interface Lead {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "course-modules".
- */
-export interface CourseModule {
-  id: number;
-  title: string;
-  description?: string | null;
-  course: number | Course;
-  order?: number | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "lessons".
  */
 export interface Lesson {
@@ -465,8 +563,32 @@ export interface Lesson {
         content?:
           | (
               | {
+                  content?: {
+                    root: {
+                      type: string;
+                      children: {
+                        type: any;
+                        version: number;
+                        [k: string]: unknown;
+                      }[];
+                      direction: ('ltr' | 'rtl') | null;
+                      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                      indent: number;
+                      version: number;
+                    };
+                    [k: string]: unknown;
+                  } | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'richTextBlock';
+                }
+              | {
                   title?: string | null;
                   videoSource?: ('bunny' | 'youtube' | 'custom') | null;
+                  video?: (number | null) | Video;
+                  /**
+                   * Legacy field. Use "Video" relationship for new uploads.
+                   */
                   bunnyVideoId?: string | null;
                   url?: string | null;
                   id?: string | null;
@@ -549,6 +671,10 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
+        relationTo: 'videos';
+        value: number | Video;
+      } | null)
+    | ({
         relationTo: 'courses';
         value: number | Course;
       } | null)
@@ -563,6 +689,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'quizzes';
         value: number | Quiz;
+      } | null)
+    | ({
+        relationTo: 'daily-quizzes';
+        value: number | DailyQuizz;
       } | null)
     | ({
         relationTo: 'problems';
@@ -680,6 +810,16 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos_select".
+ */
+export interface VideosSelect<T extends boolean = true> {
+  title?: T;
+  bunnyVideoId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "courses_select".
  */
 export interface CoursesSelect<T extends boolean = true> {
@@ -771,7 +911,7 @@ export interface QuizzesSelect<T extends boolean = true> {
           | T
           | {
               type?: T;
-              text?: T;
+              richText?: T;
               image?: T;
               options?:
                 | T
@@ -779,18 +919,35 @@ export interface QuizzesSelect<T extends boolean = true> {
                     option?: T;
                     id?: T;
                   };
-              correctAnswers?:
-                | T
-                | {
-                    answer?: T;
-                    id?: T;
-                  };
+              correctAnswers?: T;
+              explanation?: T;
               points?: T;
               timeLimit?: T;
               id?: T;
               blockName?: T;
             };
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "daily-quizzes_select".
+ */
+export interface DailyQuizzesSelect<T extends boolean = true> {
+  date?: T;
+  batch?: T;
+  module?: T;
+  question?: T;
+  type?: T;
+  options?:
+    | T
+    | {
+        option?: T;
+        id?: T;
+      };
+  correctAnswers?: T;
+  explanation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -897,11 +1054,19 @@ export interface LessonsSelect<T extends boolean = true> {
         content?:
           | T
           | {
+              richTextBlock?:
+                | T
+                | {
+                    content?: T;
+                    id?: T;
+                    blockName?: T;
+                  };
               videoBlock?:
                 | T
                 | {
                     title?: T;
                     videoSource?: T;
+                    video?: T;
                     bunnyVideoId?: T;
                     url?: T;
                     id?: T;

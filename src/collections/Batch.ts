@@ -30,6 +30,7 @@ export const Batch: CollectionConfig = {
             type: 'relationship',
             relationTo: 'courses',
             required: true,
+            hasMany: true,
             admin: {
                 position: 'sidebar',
             },

@@ -19,13 +19,22 @@ const VideoBlock: Block = {
             defaultValue: 'bunny',
         },
         {
+            name: 'video',
+            type: 'relationship',
+            relationTo: 'videos',
+            admin: {
+                condition: (_, siblingData) => siblingData.videoSource === 'bunny',
+            },
+        },
+        {
             name: 'bunnyVideoId',
             type: 'text',
             admin: {
-                condition: (_, siblingData) => siblingData.videoSource === 'bunny',
+                condition: (_, siblingData) => siblingData.videoSource === 'bunny' && !siblingData.video,
                 components: {
                     Field: '/components/BunnyVideoUpload#BunnyVideoUpload',
                 },
+                description: 'Legacy field. Use "Video" relationship for new uploads.',
             },
         },
         {
@@ -66,6 +75,16 @@ const PDFBlock: Block = {
     ]
 }
 
+const RichTextBlock: Block = {
+    slug: 'richTextBlock',
+    fields: [
+        {
+            name: 'content',
+            type: 'richText',
+        },
+    ],
+}
+
 export const Lesson: CollectionConfig = {
     slug: 'lessons',
     admin: {
@@ -100,6 +119,7 @@ export const Lesson: CollectionConfig = {
                     name: 'content',
                     type: 'blocks',
                     blocks: [
+                        RichTextBlock,
                         VideoBlock,
                         QuizBlock,
                         PDFBlock,
