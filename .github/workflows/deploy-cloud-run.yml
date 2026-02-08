@@ -11,6 +11,7 @@ env:
   PROJECT_ID: nuatlabs
   REGION: asia-south1
   SERVICE: zoi-cms
+  MIGRATION_JOB: zoi-cms-migrate
   REPO_NAME: zoi-cms-repo
   IMAGE_NAME: payload-cms
 
@@ -43,6 +44,31 @@ jobs:
           docker build -t $IMAGE_TAG .
           docker push $IMAGE_TAG
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
+      - name: Run Migrations (Cloud Run Job)
+        run: |
+          gcloud run jobs describe ${{ env.MIGRATION_JOB }} --region ${{ env.REGION }} >/dev/null 2>&1 && \
+          gcloud run jobs update ${{ env.MIGRATION_JOB }} \
+            --image ${{ env.IMAGE_TAG }} \
+            --region ${{ env.REGION }} \
+            --add-cloudsql-instances=nuatlabs:asia-south1:zoi-sql \
+            --set-env-vars "DATABASE_URL=postgres://zoi_user:Luffy%40123@localhost/zoi-sql-db?host=/cloudsql/nuatlabs:asia-south1:zoi-sql,PAYLOAD_SECRET=7b3c4254c50af606ad681cff,BUNNY_API_KEY=99635bd7-257a-4108-99ac999b14c3-aa07-4351,BUNNY_LIBRARY_ID=595073,BUNNY_CDN_HOSTNAME=vz-366bcf3a-bc2.b-cdn.net,PAYLOAD_CONFIG_PATH=src/payload.config.ts" \
+            --command "npm" \
+            --args "run","migrate" || \
+          gcloud run jobs create ${{ env.MIGRATION_JOB }} \
+            --image ${{ env.IMAGE_TAG }} \
+            --region ${{ env.REGION }} \
+            --add-cloudsql-instances=nuatlabs:asia-south1:zoi-sql \
+            --set-env-vars "DATABASE_URL=postgres://zoi_user:Luffy%40123@localhost/zoi-sql-db?host=/cloudsql/nuatlabs:asia-south1:zoi-sql,PAYLOAD_SECRET=7b3c4254c50af606ad681cff,BUNNY_API_KEY=99635bd7-257a-4108-99ac999b14c3-aa07-4351,BUNNY_LIBRARY_ID=595073,BUNNY_CDN_HOSTNAME=vz-366bcf3a-bc2.b-cdn.net,PAYLOAD_CONFIG_PATH=src/payload.config.ts" \
+            --command "npm" \
+            --args "run","migrate"
+
+          gcloud run jobs execute ${{ env.MIGRATION_JOB }} --region ${{ env.REGION }} --wait
+
+      - name: Migration Logs (on failure)
+        if: failure()
+        run: |
+          gcloud run jobs executions logs read ${{ env.MIGRATION_JOB }} --region ${{ env.REGION }} --limit 200 || true
 
       - name: Deploy to Cloud Run
         run: |
