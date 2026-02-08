@@ -71,22 +71,39 @@ Since Cloud Run is serverless, you can run a "Job" or use a temporary VM/Bastion
 
 ## 5. Continuous Deployment (GitHub Actions)
 
-A GitHub Actions workflow has been created at `.github/workflows/deploy-cloud-run.yml` to automatically deploy changes to Cloud Run when you push to the `main` branch.
+A GitHub Actions workflow has been created at `.github/workflows/deploy-cloud-run.yml` (inside the payload folder) to automatically deploy changes to Cloud Run when you push to the `main` branch.
 
 ### Setup Required
 To enable this, you must add the following **Repository Secret** in your GitHub repo settings (Settings > Secrets and variables > Actions):
 
 1.  **`GCP_SA_KEY`**:
-    - Create a Service Account in Google Cloud with specific permissions:
-        - `Cloud Run Developer`
-        - `Storage Admin` (or Artifact Registry Writer)
-        - `Service Account User`
-    - Generate a JSON key for this service account.
-    - Paste the entire JSON content as the value for `GCP_SA_KEY`.
+    - **Step 1: Create Service Account**
+      ```bash
+      # Run in your local terminal
+      gcloud iam service-accounts create github-deployer --display-name="GitHub Actions Deployer"
+      ```
+    - **Step 2: Assign Permissions**
+      ```bash
+      # Allow pushing to Artifact Registry & deploying to Cloud Run
+      gcloud projects add-iam-policy-binding nuatlabs --member="serviceAccount:github-deployer@nuatlabs.iam.gserviceaccount.com" --role="roles/run.developer"
+      gcloud projects add-iam-policy-binding nuatlabs --member="serviceAccount:github-deployer@nuatlabs.iam.gserviceaccount.com" --role="roles/iam.serviceAccountUser"
+      gcloud projects add-iam-policy-binding nuatlabs --member="serviceAccount:github-deployer@nuatlabs.iam.gserviceaccount.com" --role="roles/artifactregistry.writer"
+      ```
+    - **Step 3: Generate Key**
+      ```bash
+      gcloud iam service-accounts keys create key.json --iam-account=github-deployer@nuatlabs.iam.gserviceaccount.com
+      ```
+    - **Step 4: Add to GitHub**
+      - Open the generated `key.json` file.
+      - Copy the **entire** content.
+      - Go to GitHub Repo > Settings > Secrets > Actions > New Repository Secret.
+      - Name: `GCP_SA_KEY`
+      - Value: [Paste JSON content]
+      - **Delete the local `key.json` file immediately after.**
 
-### Workflow Behavior
-- Triggers on push to `main` (only if files in `payload/` change).
-- Builds the Docker image.
-- Pushes to Artifact Registry.
-- Deploys the new image to Cloud Run (preserving existing environment variables).
+### Migrations
+Migrations are configured to run **automatically** when the Cloud Run container starts.
+- The `start` script in `package.json` runs `payload migrate` before `next start`.
+- This ensures that every time a new revision is deployed, the database schema is updated before the app serves traffic.
+
 
