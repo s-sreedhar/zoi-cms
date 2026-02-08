@@ -20,7 +20,7 @@ This guide outlines the steps to deploy the Payload CMS to Google Cloud Run, usi
 
 2.  **Create Database and User**:
     ```bash
-    gcloud sql databases create zoi_sql-db --instance=zoi-sql
+    gcloud sql databases create zoi-sql-db --instance=zoi-sql
     gcloud sql users create zoi_user --instance=zoi-sql --password=Luffy@123
     ```
 
@@ -51,7 +51,7 @@ This guide outlines the steps to deploy the Payload CMS to Google Cloud Run, usi
 Deploy the service using the pushed image.
 
 ```bash
-gcloud run deploy zoi-cms --image asia-south1-docker.pkg.dev/nuatlabs/zoi-cms-repo/payload-cms:latest --region=asia-south1 --platform=managed --allow-unauthenticated --add-cloudsql-instances=nuatlabs:asia-south1:zoi-sql --set-env-vars "DATABASE_URL=postgres://zoi_user:Luffy%40123@localhost/zoi-sql-db?host=/cloudsql/nuatlabs:asia-south1:zoi-sql,PAYLOAD_SECRET=7b3c4254c50af606ad681cff,BUNNY_API_KEY=99635bd7-257a-4108-99ac999b14c3-aa07-4351,BUNNY_LIBRARY_ID=595073,BUNNY_CDN_HOSTNAME=vz-366bcf3a-bc2.b-cdn.net"
+gcloud run deploy zoi-cms --image asia-south1-docker.pkg.dev/nuatlabs/zoi-cms-repo/payload-cms:latest --region=asia-south1 --platform=managed --allow-unauthenticated --add-cloudsql-instances=nuatlabs:asia-south1:zoi-sql --set-env-vars "DATABASE_URL=postgres://zoi_user:Luffy%40123@localhost/zoi-sql-db?host=/cloudsql/nuatlabs:asia-south1:zoi-sql,PAYLOAD_SECRET=7b3c4254c50af606ad681cff,BUNNY_API_KEY=99635bd7-257a-4108-99ac999b14c3-aa07-4351,BUNNY_LIBRARY_ID=595073,BUNNY_CDN_HOSTNAME=vz-366bcf3a-bc2.b-cdn.net,PAYLOAD_CONFIG_PATH=src/payload.config.ts"
 ```
 
 ### Important Notes
