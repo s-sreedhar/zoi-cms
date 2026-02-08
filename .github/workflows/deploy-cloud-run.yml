@@ -60,7 +60,7 @@ jobs:
       - name: Migration Logs (on failure)
         if: failure()
         run: |
-          EXECUTION=$(gcloud run jobs executions list ${{ env.MIGRATION_JOB }} --region ${{ env.REGION }} --limit 1 --sort-by=~createTime --format="value(metadata.name)") || true
+          EXECUTION=$(gcloud run jobs describe ${{ env.MIGRATION_JOB }} --region ${{ env.REGION }} --format="value(status.latestCreatedExecution.name)") || true
           if [ -n "$EXECUTION" ]; then
             gcloud run jobs executions logs read ${{ env.MIGRATION_JOB }} --region ${{ env.REGION }} --limit 200 --execution "$EXECUTION" || true
           else

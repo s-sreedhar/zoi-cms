@@ -51,7 +51,8 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL || '',
     },
     migrationDir: path.resolve(dirname, 'migrations'),
-    push: true,
+    // Use migrations in production; keep push for local dev only.
+    push: process.env.NODE_ENV !== 'production',
   }),
   sharp,
   plugins: [
