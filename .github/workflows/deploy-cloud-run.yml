@@ -47,15 +47,7 @@ jobs:
 
       - name: Run Migrations (Cloud Run Job)
         run: |
-          gcloud run jobs describe ${{ env.MIGRATION_JOB }} --region ${{ env.REGION }} >/dev/null 2>&1 && \
-          gcloud run jobs update ${{ env.MIGRATION_JOB }} \
-            --image ${{ env.IMAGE_TAG }} \
-            --region ${{ env.REGION }} \
-            --set-cloudsql-instances=nuatlabs:asia-south1:zoi-sql \
-            --set-env-vars "DATABASE_URL=postgres://zoi_user:Luffy%40123@localhost/zoi-sql-db?host=/cloudsql/nuatlabs:asia-south1:zoi-sql,PAYLOAD_SECRET=7b3c4254c50af606ad681cff,BUNNY_API_KEY=99635bd7-257a-4108-99ac999b14c3-aa07-4351,BUNNY_LIBRARY_ID=595073,BUNNY_CDN_HOSTNAME=vz-366bcf3a-bc2.b-cdn.net,PAYLOAD_CONFIG_PATH=src/payload.config.ts" \
-            --command "npm" \
-            --args "run","migrate" || \
-          gcloud run jobs create ${{ env.MIGRATION_JOB }} \
+          gcloud run jobs deploy ${{ env.MIGRATION_JOB }} \
             --image ${{ env.IMAGE_TAG }} \
             --region ${{ env.REGION }} \
             --set-cloudsql-instances=nuatlabs:asia-south1:zoi-sql \
@@ -68,7 +60,12 @@ jobs:
       - name: Migration Logs (on failure)
         if: failure()
         run: |
-          gcloud run jobs executions logs read ${{ env.MIGRATION_JOB }} --region ${{ env.REGION }} --limit 200 || true
+          EXECUTION=$(gcloud run jobs executions list ${{ env.MIGRATION_JOB }} --region ${{ env.REGION }} --limit 1 --sort-by=~createTime --format="value(metadata.name)") || true
+          if [ -n "$EXECUTION" ]; then
+            gcloud run jobs executions logs read ${{ env.MIGRATION_JOB }} --region ${{ env.REGION }} --limit 200 --execution "$EXECUTION" || true
+          else
+            gcloud run jobs executions logs read ${{ env.MIGRATION_JOB }} --region ${{ env.REGION }} --limit 200 || true
+          fi
 
       - name: Deploy to Cloud Run
         run: |
