@@ -22,6 +22,7 @@ import { Feedback } from './collections/Feedback'
 import { CourseModule } from './collections/CourseModule'
 import { Lesson } from './collections/Lesson'
 import { CourseProgress } from './collections/CourseProgress'
+import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -53,6 +54,8 @@ export default buildConfig({
     migrationDir: path.resolve(dirname, 'migrations'),
     // Use migrations in production; keep push for local dev only.
     push: process.env.NODE_ENV !== 'production',
+    // Automatically run migrations in production on startup
+    prodMigrations: migrations,
   }),
   sharp,
   plugins: [
