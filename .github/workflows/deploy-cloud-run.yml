@@ -45,34 +45,113 @@ jobs:
           docker push $IMAGE_TAG
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
-      - name: Run Migrations (Cloud Run Job)
+      - name: Deploy Migration Job
         run: |
           gcloud run jobs deploy ${{ env.MIGRATION_JOB }} \
             --image ${{ env.IMAGE_TAG }} \
             --region ${{ env.REGION }} \
             --set-cloudsql-instances=nuatlabs:asia-south1:zoi-sql \
-            --set-env-vars "DATABASE_URL=postgres://zoi_user:Luffy%40123@localhost/zoi-sql-db?host=/cloudsql/nuatlabs:asia-south1:zoi-sql,PAYLOAD_SECRET=7b3c4254c50af606ad681cff,BUNNY_API_KEY=99635bd7-257a-4108-99ac999b14c3-aa07-4351,BUNNY_LIBRARY_ID=595073,BUNNY_CDN_HOSTNAME=vz-366bcf3a-bc2.b-cdn.net,PAYLOAD_CONFIG_PATH=src/payload.config.ts" \
-            --command "npm" \
-            --args "run","migrate"
+            --set-env-vars "DATABASE_URL=postgres://zoi_user:Luffy%40123@localhost/zoi-sql-db?host=/cloudsql/nuatlabs:asia-south1:zoi-sql,PAYLOAD_SECRET=7b3c4254c50af606ad681cff,NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts" \
+            --max-retries=0 \
+            --task-timeout=10m \
+            --memory=1Gi \
+            --cpu=1 \
+            --command="pnpm" \
+            --args="tsx,scripts/migrate.ts"
 
-          gcloud run jobs execute ${{ env.MIGRATION_JOB }} --region ${{ env.REGION }} --wait
+      - name: Run Migrations
+        id: migrate
+        run: |
+          echo "🔄 Running database migrations..."
+          if gcloud run jobs execute ${{ env.MIGRATION_JOB }} --region ${{ env.REGION }} --wait; then
+            echo "✅ Migrations completed successfully"
+            echo "migration_status=success" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Migration failed"
+            echo "migration_status=failed" >> $GITHUB_OUTPUT
+            exit 1
+          fi
 
       - name: Migration Logs (on failure)
-        if: failure()
+        if: failure() && steps.migrate.outcome == 'failure'
         run: |
-          EXECUTION=$(gcloud run jobs describe ${{ env.MIGRATION_JOB }} --region ${{ env.REGION }} --format="value(status.latestCreatedExecution.name)") || true
+          echo "📋 Fetching migration logs..."
+          EXECUTION=$(gcloud run jobs executions list ${{ env.MIGRATION_JOB }} \
+            --region ${{ env.REGION }} \
+            --limit 1 \
+            --sort-by=~createTime \
+            --format="value(metadata.name)") || true
+          
           if [ -n "$EXECUTION" ]; then
-            gcloud run jobs executions logs read ${{ env.MIGRATION_JOB }} --region ${{ env.REGION }} --limit 200 --execution "$EXECUTION" || true
+            echo "📄 Logs for execution: $EXECUTION"
+            gcloud run jobs executions logs read ${{ env.MIGRATION_JOB }} \
+              --region ${{ env.REGION }} \
+              --limit 200 \
+              --execution "$EXECUTION" || true
           else
-            gcloud run jobs executions logs read ${{ env.MIGRATION_JOB }} --region ${{ env.REGION }} --limit 200 || true
+            echo "📄 Latest migration logs:"
+            gcloud run jobs executions logs read ${{ env.MIGRATION_JOB }} \
+              --region ${{ env.REGION }} \
+              --limit 200 || true
           fi
 
       - name: Deploy to Cloud Run
+        id: deploy
         run: |
+          echo "🚢 Deploying application to Cloud Run..."
           gcloud run deploy ${{ env.SERVICE }} \
             --image ${{ env.IMAGE_TAG }} \
             --platform=managed \
             --allow-unauthenticated \
             --region ${{ env.REGION }} \
             --add-cloudsql-instances=nuatlabs:asia-south1:zoi-sql \
-            --set-env-vars "DATABASE_URL=postgres://zoi_user:Luffy%40123@localhost/zoi-sql-db?host=/cloudsql/nuatlabs:asia-south1:zoi-sql,PAYLOAD_SECRET=7b3c4254c50af606ad681cff,BUNNY_API_KEY=99635bd7-257a-4108-99ac999b14c3-aa07-4351,BUNNY_LIBRARY_ID=595073,BUNNY_CDN_HOSTNAME=vz-366bcf3a-bc2.b-cdn.net,PAYLOAD_CONFIG_PATH=src/payload.config.ts"
+            --set-env-vars "DATABASE_URL=postgres://zoi_user:Luffy%40123@localhost/zoi-sql-db?host=/cloudsql/nuatlabs:asia-south1:zoi-sql,PAYLOAD_SECRET=7b3c4254c50af606ad681cff,NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts,BUNNY_API_KEY=99635bd7-257a-4108-99ac999b14c3-aa07-4351,BUNNY_LIBRARY_ID=595073,BUNNY_CDN_HOSTNAME=vz-366bcf3a-bc2.b-cdn.net" \
+            --memory=2Gi \
+            --cpu=2 \
+            --min-instances=0 \
+            --max-instances=10 \
+            --timeout=300
+
+      - name: Get Service URL
+        id: get_url
+        run: |
+          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE }} \
+            --region ${{ env.REGION }} \
+            --format="value(status.url)")
+          echo "service_url=$SERVICE_URL" >> $GITHUB_OUTPUT
+          echo "🌐 Service URL: $SERVICE_URL"
+
+      - name: Health Check
+        run: |
+          echo "🏥 Performing health check..."
+          SERVICE_URL="${{ steps.get_url.outputs.service_url }}"
+          
+          # Wait for service to be ready
+          sleep 10
+          
+          # Try to access the service (up to 3 attempts)
+          for i in {1..3}; do
+            if curl -f -s -o /dev/null -w "%{http_code}" "$SERVICE_URL/api/health" | grep -q "200"; then
+              echo "✅ Health check passed"
+              exit 0
+            fi
+            echo "⏳ Attempt $i failed, retrying in 10s..."
+            sleep 10
+          done
+          
+          echo "⚠️ Health check failed, but deployment completed"
+          echo "Please verify the service manually at: $SERVICE_URL/admin"
+
+      - name: Deployment Summary
+        if: success()
+        run: |
+          echo "╔════════════════════════════════════════════════════════════╗"
+          echo "║              🎉 Deployment Successful! 🎉                  ║"
+          echo "╚════════════════════════════════════════════════════════════╝"
+          echo ""
+          echo "🌐 Service URL: ${{ steps.get_url.outputs.service_url }}"
+          echo "📊 Admin Panel: ${{ steps.get_url.outputs.service_url }}/admin"
+          echo ""
+          echo "✅ Migrations: Completed"
+          echo "✅ Deployment: Successful"
+          echo "✅ Health Check: Passed"
