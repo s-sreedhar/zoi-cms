@@ -43,6 +43,9 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Copy node_modules for Payload CLI (needed for migrations)
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+
 # Copy migration files and scripts for Cloud Run Jobs
 COPY --from=builder --chown=nextjs:nodejs /app/src/migrations ./src/migrations
 COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts

@@ -56,8 +56,8 @@ jobs:
             --task-timeout=10m \
             --memory=1Gi \
             --cpu=1 \
-            --command="pnpm" \
-            --args="tsx,scripts/migrate.ts"
+            --command="node" \
+            --args="node_modules/.bin/payload,migrate"
 
       - name: Run Migrations
         id: migrate
