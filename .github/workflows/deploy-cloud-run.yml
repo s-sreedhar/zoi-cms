@@ -57,7 +57,7 @@ jobs:
             --memory=1Gi \
             --cpu=1 \
             --command="node" \
-            --args="node_modules/.bin/payload,migrate"
+            --args="node_modules/payload/dist/bin/index.js,migrate"
 
       - name: Run Migrations
         id: migrate
