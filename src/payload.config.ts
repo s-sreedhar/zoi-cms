@@ -33,7 +33,14 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    meta: {
+      titleSuffix: '- NUAT Labs CMS',
+    },
     components: {
+      graphics: {
+        Logo: '/components/CMSLogo#CMSLogo',
+        Icon: '/components/CMSLogo#CMSIcon',
+      },
       views: {
         dashboard: {
           Component: '/components/AdminDashboard#default',

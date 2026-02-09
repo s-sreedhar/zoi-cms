@@ -1,0 +1,51 @@
+// Custom Brand Styles for NUAT Labs
+:root {
+    --brand-primary: #a2bd43;
+    --brand-primary-hover: #b4d14a;
+    --brand-secondary: #0A0A0F;
+}
+
+[data-theme='light'],
+[data-theme='dark'] {
+    --theme-success-500: var(--brand-primary);
+    --theme-primary-500: var(--brand-primary);
+    --theme-primary-400: var(--brand-primary);
+    --theme-primary-600: var(--brand-primary-hover);
+}
+
+.cms-logo {
+    transition: transform 0.3s ease;
+
+    &:hover {
+        transform: scale(1.02);
+    }
+}
+
+// Custom dashboard styles
+.dashboard {
+    &__header {
+        h1 {
+            background: linear-gradient(135deg, #000, #444);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+
+            [data-theme='dark'] & {
+                background: linear-gradient(135deg, #fff, #aaa);
+                background-clip: text;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+        }
+    }
+}
+
+.stats-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+        transform: translateY(-4px);
+        border-color: var(--brand-primary) !important;
+        box-shadow: 0 10px 25px -5px rgba(162, 189, 67, 0.2) !important;
+    }
+}
