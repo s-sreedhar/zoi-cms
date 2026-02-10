@@ -6,6 +6,9 @@ export const Workshop: CollectionConfig = {
     admin: {
         useAsTitle: 'title',
     },
+    access: {
+        read: () => true,
+    },
     fields: [
         {
             name: 'title',
@@ -40,34 +43,12 @@ export const Workshop: CollectionConfig = {
             type: 'date',
         },
         {
-            name: 'instructor',
-            type: 'text',
-        },
-        {
-            name: 'price',
-            type: 'number',
-        },
-        {
-            name: 'place',
-            type: 'text',
-            label: 'Google Maps Link',
-        },
-        {
-            name: 'presetCollege',
-            type: 'text',
-        },
-        {
-            name: 'hidden',
-            type: 'checkbox',
-            defaultValue: false,
-        },
-        {
             name: 'instructors',
             type: 'relationship',
             relationTo: 'users',
             hasMany: true,
             filterOptions: {
-                role: { equals: 'instructor' },
+                role: { in: ['instructor', 'superadmin'] },
             },
             admin: {
                 position: 'sidebar',

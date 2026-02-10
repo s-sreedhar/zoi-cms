@@ -68,6 +68,7 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    companies: Company;
     media: Media;
     videos: Video;
     courses: Course;
@@ -90,6 +91,7 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    companies: CompaniesSelect<false> | CompaniesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
     courses: CoursesSelect<false> | CoursesSelect<true>;
@@ -193,6 +195,48 @@ export interface Batch {
   offerDetails?: string | null;
   instructors?: (number | User)[] | null;
   hidden?: boolean | null;
+  syllabus?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  curriculum?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  images?:
+    | {
+        image?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  documents?:
+    | {
+        document?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -259,6 +303,16 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "companies".
+ */
+export interface Company {
+  id: number;
+  name: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "videos".
  */
 export interface Video {
@@ -282,11 +336,6 @@ export interface Workshop {
   description: string;
   startDate: string;
   endDate?: string | null;
-  instructor?: string | null;
-  price?: number | null;
-  place?: string | null;
-  presetCollege?: string | null;
-  hidden?: boolean | null;
   instructors?: (number | User)[] | null;
   images?:
     | {
@@ -469,6 +518,7 @@ export interface Problem {
     | number
     | boolean
     | null;
+  companyTags?: (number | Company)[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -520,6 +570,14 @@ export interface Feedback {
       }[]
     | null;
   additionalComments?: string | null;
+  quizId?: string | null;
+  sessionId?: string | null;
+  difficulty?: ('Easy' | 'Medium' | 'Hard' | 'Very Hard') | null;
+  giftPreference?: string | null;
+  contactName?: string | null;
+  contactPhone?: string | null;
+  place?: string | null;
+  howDidYouFindUs?: string | null;
   source?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -668,6 +726,10 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'companies';
+        value: number | Company;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -793,6 +855,15 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "companies_select".
+ */
+export interface CompaniesSelect<T extends boolean = true> {
+  name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
@@ -863,6 +934,20 @@ export interface BatchesSelect<T extends boolean = true> {
   offerDetails?: T;
   instructors?: T;
   hidden?: T;
+  syllabus?: T;
+  curriculum?: T;
+  images?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  documents?:
+    | T
+    | {
+        document?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -876,11 +961,6 @@ export interface WorkshopsSelect<T extends boolean = true> {
   description?: T;
   startDate?: T;
   endDate?: T;
-  instructor?: T;
-  price?: T;
-  place?: T;
-  presetCollege?: T;
-  hidden?: T;
   instructors?: T;
   images?:
     | T
@@ -963,6 +1043,7 @@ export interface ProblemsSelect<T extends boolean = true> {
   template?: T;
   testbench?: T;
   testCases?: T;
+  companyTags?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1001,6 +1082,14 @@ export interface FeedbackSelect<T extends boolean = true> {
         id?: T;
       };
   additionalComments?: T;
+  quizId?: T;
+  sessionId?: T;
+  difficulty?: T;
+  giftPreference?: T;
+  contactName?: T;
+  contactPhone?: T;
+  place?: T;
+  howDidYouFindUs?: T;
   source?: T;
   updatedAt?: T;
   createdAt?: T;

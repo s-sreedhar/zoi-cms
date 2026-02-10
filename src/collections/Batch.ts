@@ -6,6 +6,9 @@ export const Batch: CollectionConfig = {
     admin: {
         useAsTitle: 'name',
     },
+    access: {
+        read: () => true,
+    },
     fields: [
         {
             name: 'name',
@@ -109,6 +112,36 @@ export const Batch: CollectionConfig = {
             name: 'hidden',
             type: 'checkbox',
             defaultValue: false,
+        },
+        {
+            name: 'syllabus',
+            type: 'richText',
+        },
+        {
+            name: 'curriculum',
+            type: 'richText',
+        },
+        {
+            name: 'images',
+            type: 'array',
+            fields: [
+                {
+                    name: 'image',
+                    type: 'upload',
+                    relationTo: 'media',
+                },
+            ],
+        },
+        {
+            name: 'documents',
+            type: 'array',
+            fields: [
+                {
+                    name: 'document',
+                    type: 'upload',
+                    relationTo: 'media',
+                },
+            ],
         },
     ],
 }

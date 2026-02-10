@@ -44,5 +44,11 @@ export const Problem: CollectionConfig = {
             name: 'testCases',
             type: 'json',
         },
+        {
+            name: 'companyTags',
+            type: 'relationship',
+            relationTo: 'companies',
+            hasMany: true,
+        },
     ],
 }

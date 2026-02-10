@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { googleOauthHandler } from '../endpoints/oauth'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -33,4 +34,12 @@ export const Users: CollectionConfig = {
       relationTo: 'batches',
     },
   ],
+  endpoints: [
+    {
+      path: '/oauth/google',
+      method: 'post',
+      handler: googleOauthHandler,
+    },
+  ],
 }
+

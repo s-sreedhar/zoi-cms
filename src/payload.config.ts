@@ -8,6 +8,7 @@ import { s3Storage } from '@payloadcms/storage-s3'
 import sharp from 'sharp'
 
 import { Users } from './collections/Users'
+import { Company } from './collections/Company'
 import { Media } from './collections/Media'
 import { Videos } from './collections/Videos'
 import { Course } from './collections/Course'
@@ -48,7 +49,7 @@ export default buildConfig({
       },
     },
   },
-  collections: [Users, Media, Videos, Course, Batch, Workshop, Quiz, DailyQuiz, Problem, Session, Feedback, Leads, CourseModule, Lesson, CourseProgress],
+  collections: [Users, Company, Media, Videos, Course, Batch, Workshop, Quiz, DailyQuiz, Problem, Session, Feedback, Leads, CourseModule, Lesson, CourseProgress],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -64,6 +65,22 @@ export default buildConfig({
     // Automatically run migrations in production on startup
     prodMigrations: migrations,
   }),
+  cors: [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://zoi-cms-991931824365.asia-south1.run.app',
+    'https://zoi-frontend.vercel.app', // Adding user's production frontend
+    'https://www.nuatlabs.com', // Adding main domain
+    process.env.PAYLOAD_PUBLIC_SERVER_URL || '',
+  ].filter(Boolean),
+  csrf: [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://zoi-cms-991931824365.asia-south1.run.app',
+    'https://zoi-frontend.vercel.app',
+    'https://www.nuatlabs.com',
+    process.env.PAYLOAD_PUBLIC_SERVER_URL || '',
+  ].filter(Boolean),
   sharp,
   plugins: [
     ...(process.env.R2_ACCOUNT_ID
