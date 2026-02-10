@@ -1,7 +1,7 @@
 import * as migration_20260210_000000_master from './20260210_000000_master';
 import * as migration_20260210_122125_fix_lesson_schema_debug_v3 from './20260210_122125_fix_lesson_schema_debug_v3';
 import * as migration_20260210_122731_fix_missing_collections from './20260210_122731_fix_missing_collections';
-import * as migration_20260210_180419 from './20260210_180419';
+import * as migration_20260210_180420_safe from './20260210_180420_safe';
 
 export const migrations = [
   {
@@ -20,8 +20,8 @@ export const migrations = [
     name: '20260210_122731_fix_missing_collections',
   },
   {
-    up: migration_20260210_180419.up,
-    down: migration_20260210_180419.down,
-    name: '20260210_180419'
+    up: migration_20260210_180420_safe.up,
+    down: migration_20260210_180420_safe.down,
+    name: '20260210_180420_safe'
   },
 ];
