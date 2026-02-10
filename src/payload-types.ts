@@ -554,6 +554,7 @@ export interface Lead {
  */
 export interface Lesson {
   id: number;
+  temp_trigger?: string | null;
   title: string;
   module: number | CourseModule;
   order?: number | null;
@@ -1044,6 +1045,7 @@ export interface CourseModulesSelect<T extends boolean = true> {
  * via the `definition` "lessons_select".
  */
 export interface LessonsSelect<T extends boolean = true> {
+  temp_trigger?: T;
   title?: T;
   module?: T;
   order?: T;

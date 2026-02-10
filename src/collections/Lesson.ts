@@ -92,6 +92,10 @@ export const Lesson: CollectionConfig = {
     },
     fields: [
         {
+            name: 'temp_trigger',
+            type: 'text',
+        },
+        {
             name: 'title',
             type: 'text',
             required: true,
