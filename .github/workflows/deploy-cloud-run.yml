@@ -106,7 +106,7 @@ jobs:
             --allow-unauthenticated \
             --region ${{ env.REGION }} \
             --add-cloudsql-instances=nuatlabs:asia-south1:zoi-sql \
-            --set-env-vars "DATABASE_URL=postgres://zoi_user:Luffy%40123@localhost/zoi-sql-db?host=/cloudsql/nuatlabs:asia-south1:zoi-sql,PAYLOAD_SECRET=7b3c4254c50af606ad681cff,NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts,BUNNY_API_KEY=99635bd7-257a-4108-99ac999b14c3-aa07-4351,BUNNY_LIBRARY_ID=595073,BUNNY_CDN_HOSTNAME=vz-366bcf3a-bc2.b-cdn.net" \
+            --set-env-vars "DATABASE_URL=postgres://zoi_user:Luffy%40123@localhost/zoi-sql-db?host=/cloudsql/nuatlabs:asia-south1:zoi-sql,PAYLOAD_SECRET=7b3c4254c50af606ad681cff,NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts,BUNNY_API_KEY=99635bd7-257a-4108-99ac999b14c3-aa07-4351,BUNNY_LIBRARY_ID=595073,BUNNY_CDN_HOSTNAME=vz-366bcf3a-bc2.b-cdn.net,R2_ACCOUNT_ID=${{ secrets.R2_ACCOUNT_ID }},R2_ACCESS_KEY_ID=${{ secrets.R2_ACCESS_KEY_ID }},R2_SECRET_ACCESS_KEY=${{ secrets.R2_SECRET_ACCESS_KEY }},R2_BUCKET_NAME=${{ secrets.R2_BUCKET_NAME }}" \
             --memory=2Gi \
             --cpu=2 \
             --min-instances=0 \
