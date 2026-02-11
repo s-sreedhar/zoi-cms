@@ -1,4 +1,4 @@
-import { BunnyVideoUpload as BunnyVideoUpload_8ab9ae94a37581d96c478279951f40b0 } from '../../../components/BunnyVideoUpload'
+import { BunnyVideoUpload as BunnyVideoUpload_8ab9ae94a37581d96c478279951f40b0 } from '../../../../components/BunnyVideoUpload'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -22,10 +22,10 @@ import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93
 import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-import { CorrectAnswerSelect as CorrectAnswerSelect_94cb83969fc3dc74be0d7be4133195e7 } from '../../../components/CorrectAnswerSelect'
-import { CMSIcon as CMSIcon_b11ba3c6336c99ea440f61b2744ba415 } from '../../../components/CMSLogo'
-import { CMSLogo as CMSLogo_b11ba3c6336c99ea440f61b2744ba415 } from '../../../components/CMSLogo'
-import { default as default_23ec33776346719f737fb9ed0745e7e8 } from '../../../components/AdminDashboard'
+import { CorrectAnswerSelect as CorrectAnswerSelect_94cb83969fc3dc74be0d7be4133195e7 } from '../../../../components/CorrectAnswerSelect'
+import { CMSIcon as CMSIcon_b11ba3c6336c99ea440f61b2744ba415 } from '../../../../components/CMSLogo'
+import { CMSLogo as CMSLogo_b11ba3c6336c99ea440f61b2744ba415 } from '../../../../components/CMSLogo'
+import { default as default_23ec33776346719f737fb9ed0745e7e8 } from '../../../../components/AdminDashboard'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
