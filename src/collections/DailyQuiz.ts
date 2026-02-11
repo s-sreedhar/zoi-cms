@@ -67,7 +67,7 @@ export const DailyQuiz: CollectionConfig = {
             required: true,
             admin: {
                 components: {
-                    Field: '/components/CorrectAnswerSelect#CorrectAnswerSelect',
+                    Field: '/src/components/CorrectAnswerSelect#CorrectAnswerSelect',
                 },
                 description: 'Select the correct option(s).',
             },

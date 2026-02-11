@@ -36,12 +36,12 @@ export default buildConfig({
     },
     components: {
       graphics: {
-        Logo: '/components/CMSLogo#CMSLogo',
-        Icon: '/components/CMSLogo#CMSIcon',
+        Logo: '/src/components/CMSLogo#CMSLogo',
+        Icon: '/src/components/CMSLogo#CMSIcon',
       },
       views: {
         dashboard: {
-          Component: '/components/AdminDashboard#default',
+          Component: '/src/components/AdminDashboard#default',
         },
       },
     },

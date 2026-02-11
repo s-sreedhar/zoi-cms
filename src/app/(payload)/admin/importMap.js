@@ -1,4 +1,4 @@
-import { BunnyVideoUpload as BunnyVideoUpload_8ab9ae94a37581d96c478279951f40b0 } from '../../../../components/BunnyVideoUpload'
+import { BunnyVideoUpload as BunnyVideoUpload_83e334dd1edbbc604ce20ab3f856bdd2 } from '../../../../src/components/BunnyVideoUpload'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -22,14 +22,14 @@ import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93
 import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-import { CorrectAnswerSelect as CorrectAnswerSelect_94cb83969fc3dc74be0d7be4133195e7 } from '../../../../components/CorrectAnswerSelect'
-import { CMSIcon as CMSIcon_b11ba3c6336c99ea440f61b2744ba415 } from '../../../../components/CMSLogo'
-import { CMSLogo as CMSLogo_b11ba3c6336c99ea440f61b2744ba415 } from '../../../../components/CMSLogo'
-import { default as default_23ec33776346719f737fb9ed0745e7e8 } from '../../../../components/AdminDashboard'
+import { CorrectAnswerSelect as CorrectAnswerSelect_2fe523c50eca4fc1fb9c43db422bbf4f } from '../../../../src/components/CorrectAnswerSelect'
+import { CMSIcon as CMSIcon_354793b6c7ea36cbc351e0253f3946e8 } from '../../../../src/components/CMSLogo'
+import { CMSLogo as CMSLogo_354793b6c7ea36cbc351e0253f3946e8 } from '../../../../src/components/CMSLogo'
+import { default as default_0db40edc3177d0c3b10a852925d79ee3 } from '../../../../src/components/AdminDashboard'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
-  "/components/BunnyVideoUpload#BunnyVideoUpload": BunnyVideoUpload_8ab9ae94a37581d96c478279951f40b0,
+  "/src/components/BunnyVideoUpload#BunnyVideoUpload": BunnyVideoUpload_83e334dd1edbbc604ce20ab3f856bdd2,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -53,9 +53,9 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#UnderlineFeatureClient": UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
-  "/components/CorrectAnswerSelect#CorrectAnswerSelect": CorrectAnswerSelect_94cb83969fc3dc74be0d7be4133195e7,
-  "/components/CMSLogo#CMSIcon": CMSIcon_b11ba3c6336c99ea440f61b2744ba415,
-  "/components/CMSLogo#CMSLogo": CMSLogo_b11ba3c6336c99ea440f61b2744ba415,
-  "/components/AdminDashboard#default": default_23ec33776346719f737fb9ed0745e7e8,
+  "/src/components/CorrectAnswerSelect#CorrectAnswerSelect": CorrectAnswerSelect_2fe523c50eca4fc1fb9c43db422bbf4f,
+  "/src/components/CMSLogo#CMSIcon": CMSIcon_354793b6c7ea36cbc351e0253f3946e8,
+  "/src/components/CMSLogo#CMSLogo": CMSLogo_354793b6c7ea36cbc351e0253f3946e8,
+  "/src/components/AdminDashboard#default": default_0db40edc3177d0c3b10a852925d79ee3,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

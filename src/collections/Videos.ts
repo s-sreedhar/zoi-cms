@@ -17,7 +17,7 @@ export const Videos: CollectionConfig = {
             required: true,
             admin: {
                 components: {
-                    Field: '/components/BunnyVideoUpload#BunnyVideoUpload',
+                    Field: '/src/components/BunnyVideoUpload#BunnyVideoUpload',
                 },
             },
         },

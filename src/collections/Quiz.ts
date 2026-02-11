@@ -68,7 +68,7 @@ export const Quiz: CollectionConfig = {
                             required: true,
                             admin: {
                                 components: {
-                                    Field: '/components/CorrectAnswerSelect#CorrectAnswerSelect',
+                                    Field: '/src/components/CorrectAnswerSelect#CorrectAnswerSelect',
                                 },
                             },
                         },

@@ -32,7 +32,7 @@ const VideoBlock: Block = {
             admin: {
                 condition: (_, siblingData) => siblingData.videoSource === 'bunny' && !siblingData.video,
                 components: {
-                    Field: '/components/BunnyVideoUpload#BunnyVideoUpload',
+                    Field: '/src/components/BunnyVideoUpload#BunnyVideoUpload',
                 },
                 description: 'Legacy field. Use "Video" relationship for new uploads.',
             },
