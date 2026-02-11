@@ -18,18 +18,20 @@ export const googleOauthHandler: PayloadHandler = async (req) => {
         }
 
         const googleData = await googleRes.json()
-        const { email, name, sub } = googleData
+        const { email, name, sub, picture } = googleData
 
         if (!email) {
             return Response.json({ error: 'Google token content missing email' }, { status: 400 })
         }
 
         // 2. Find or Create User
-        // Note: 'users' is the slug of the collection
         const users = await payload.find({
             collection: 'users',
             where: {
-                email: { equals: email },
+                or: [
+                    { email: { equals: email } },
+                    { googleId: { equals: sub } }
+                ]
             },
             limit: 1,
         })
@@ -38,7 +40,6 @@ export const googleOauthHandler: PayloadHandler = async (req) => {
 
         if (!user) {
             // Create new user
-            // Password is required by default, so we generate a random secure one
             const randomPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8)
 
             user = await payload.create({
@@ -48,9 +49,22 @@ export const googleOauthHandler: PayloadHandler = async (req) => {
                     password: randomPassword,
                     displayName: name || email.split('@')[0],
                     role: 'customer',
-                    // You might want to store 'sub' as googleId if you added that field
+                    googleId: sub,
+                    imageUrl: picture,
                 },
             })
+        } else {
+            // Update existing user with Google info if missing
+            if (!user.googleId || !user.imageUrl) {
+                user = await payload.update({
+                    collection: 'users',
+                    id: user.id,
+                    data: {
+                        googleId: sub,
+                        imageUrl: picture,
+                    },
+                })
+            }
         }
 
         // 3. Login (Generate Token)

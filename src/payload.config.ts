@@ -28,6 +28,8 @@ import { migrations } from './migrations'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+import { openapi, swaggerUI } from 'payload-oapi'
+
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -57,17 +59,15 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL || '',
     },
     migrationDir: path.resolve(dirname, 'migrations'),
-    // Use migrations in production; keep push for local dev only.
     push: process.env.NODE_ENV !== 'production',
-    // Automatically run migrations in production on startup
     prodMigrations: migrations,
   }),
   cors: [
     'http://localhost:3000',
     'http://localhost:3001',
     'https://zoi-cms-991931824365.asia-south1.run.app',
-    'https://zoi-frontend.vercel.app', // Adding user's production frontend
-    'https://www.nuatlabs.com', // Adding main domain
+    'https://zoi-frontend.vercel.app',
+    'https://www.nuatlabs.com',
     process.env.PAYLOAD_PUBLIC_SERVER_URL || '',
   ].filter(Boolean),
   csrf: [
@@ -80,6 +80,14 @@ export default buildConfig({
   ].filter(Boolean),
   sharp,
   plugins: [
+    openapi({
+      openapiVersion: '3.0',
+      metadata: {
+        title: 'ZOI CMS API',
+        version: '1.0.0',
+      },
+    }),
+    swaggerUI({}),
     ...(process.env.R2_ACCOUNT_ID
       ? [
         s3Storage({

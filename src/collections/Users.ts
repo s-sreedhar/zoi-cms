@@ -33,6 +33,21 @@ export const Users: CollectionConfig = {
       type: 'relationship',
       relationTo: 'batches',
     },
+    {
+      name: 'googleId',
+      type: 'text',
+      admin: {
+        readOnly: true,
+      },
+      index: true,
+    },
+    {
+      name: 'imageUrl',
+      type: 'text',
+      admin: {
+        readOnly: true,
+      },
+    },
   ],
   endpoints: [
     {

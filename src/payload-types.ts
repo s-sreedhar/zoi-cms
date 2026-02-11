@@ -152,6 +152,8 @@ export interface User {
   role: 'superadmin' | 'customer' | 'instructor' | 'admin';
   phoneNumber?: string | null;
   batch?: (number | null) | Batch;
+  googleId?: string | null;
+  imageUrl?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -836,6 +838,8 @@ export interface UsersSelect<T extends boolean = true> {
   role?: T;
   phoneNumber?: T;
   batch?: T;
+  googleId?: T;
+  imageUrl?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
