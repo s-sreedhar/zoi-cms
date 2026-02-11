@@ -22,6 +22,7 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Build Next.js with standalone output
+ENV R2_ACCOUNT_ID=build_placeholder
 RUN corepack enable pnpm && pnpm run build
 
 # Production image, copy all the files and run next
