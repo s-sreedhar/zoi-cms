@@ -3,6 +3,7 @@ import * as migration_20260210_122125_fix_lesson_schema_debug_v3 from './2026021
 import * as migration_20260210_122731_fix_missing_collections from './20260210_122731_fix_missing_collections';
 import * as migration_20260210_180420_safe from './20260210_180420_safe';
 import * as migration_20260211_155246_add_google_auth_fields from './20260211_155246_add_google_auth_fields';
+import * as migration_20260211_180430_add_streak_field from './20260211_180430_add_streak_field';
 
 export const migrations = [
   {
@@ -28,6 +29,11 @@ export const migrations = [
   {
     up: migration_20260211_155246_add_google_auth_fields.up,
     down: migration_20260211_155246_add_google_auth_fields.down,
-    name: '20260211_155246_add_google_auth_fields'
+    name: '20260211_155246_add_google_auth_fields',
+  },
+  {
+    up: migration_20260211_180430_add_streak_field.up,
+    down: migration_20260211_180430_add_streak_field.down,
+    name: '20260211_180430_add_streak_field'
   },
 ];

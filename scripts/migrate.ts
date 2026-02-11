@@ -14,8 +14,6 @@ import dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { getPayload } from 'payload'
-import config from '../src/payload.config.js'
-
 // Load environment variables
 dotenv.config()
 
@@ -38,6 +36,9 @@ async function runMigrations() {
 
     try {
         console.log('Initializing Payload...')
+
+        // Dynamically import config to ensure env vars are loaded first
+        const { default: config } = await import('../src/payload.config.js')
 
         // Initialize Payload with the config
         const payload = await getPayload({ config })

@@ -69,6 +69,6 @@ LABEL org.opencontainers.image.title="Zoi CMS - Payload CMS"
 LABEL org.opencontainers.image.description="Payload CMS for Zoi Platform"
 LABEL org.opencontainers.image.vendor="Nuat Labs"
 
-# Use standalone server.js instead of npm start
-# Migrations are handled separately via Cloud Run Jobs
-CMD ["node", "server.js"]
+# Run migrations before starting the server
+# This ensures that the database schema is up to date with the code
+CMD ["sh", "-c", "npm run migrate && node server.js"]
