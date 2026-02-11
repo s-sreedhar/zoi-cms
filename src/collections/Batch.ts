@@ -105,7 +105,7 @@ export const Batch: CollectionConfig = {
             relationTo: 'users',
             hasMany: true,
             filterOptions: {
-                role: { equals: 'instructor' },
+                role: { in: ['instructor', 'admin', 'superadmin'] },
             },
         },
         {

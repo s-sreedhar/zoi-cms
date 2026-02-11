@@ -4,9 +4,33 @@ import { googleOauthHandler } from '../endpoints/oauth'
 export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
-    useAsTitle: 'email',
+    useAsTitle: 'displayName',
   },
   auth: true,
+  hooks: {
+    afterLogin: [
+      async ({ req, user }) => {
+        const sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        const ip = req.headers.get('x-forwarded-for') || 'unknown';
+
+        await req.payload.update({
+          collection: 'users',
+          id: user.id,
+          data: {
+            activeSessionId: sessionId,
+            lastIP: ip,
+            lastLogin: new Date().toISOString()
+          }
+        });
+
+        // We can't easily modify the response from afterLogin for Local API directly in types,
+        // but for REST it will be merged if we are careful or we just rely on frontend fetching profile.
+        // Actually, Payload returns the user object in the login response.
+        // By updating the user object in the DB, the returned user might have it.
+        return user;
+      }
+    ]
+  },
   fields: [
     {
       name: 'displayName',
@@ -44,6 +68,51 @@ export const Users: CollectionConfig = {
     {
       name: 'imageUrl',
       type: 'text',
+      admin: {
+        readOnly: true,
+      },
+    },
+    {
+      name: 'streak',
+      type: 'number',
+      defaultValue: 0,
+      admin: {
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'points',
+      type: 'number',
+      defaultValue: 0,
+      admin: {
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'lastQuizDate',
+      type: 'date',
+      admin: {
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'activeSessionId',
+      type: 'text',
+      admin: {
+        readOnly: true,
+      },
+    },
+
+    {
+      name: 'lastIP',
+      type: 'text',
+      admin: {
+        readOnly: true,
+      },
+    },
+    {
+      name: 'lastLogin',
+      type: 'date',
       admin: {
         readOnly: true,
       },

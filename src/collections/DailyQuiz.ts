@@ -35,6 +35,14 @@ export const DailyQuiz: CollectionConfig = {
             required: true,
         },
         {
+            name: 'image',
+            type: 'upload',
+            relationTo: 'media',
+            admin: {
+                description: 'Optional image for the quiz question.',
+            },
+        },
+        {
             name: 'type',
             type: 'select',
             options: [

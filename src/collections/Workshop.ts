@@ -16,6 +16,20 @@ export const Workshop: CollectionConfig = {
             required: true,
         },
         {
+            name: 'status',
+            type: 'select',
+            options: [
+                { label: 'Upcoming', value: 'upcoming' },
+                { label: 'Open', value: 'open' },
+                { label: 'Closed', value: 'closed' },
+            ],
+            defaultValue: 'upcoming',
+            required: true,
+            admin: {
+                position: 'sidebar',
+            },
+        },
+        {
             name: 'slug',
             type: 'text',
             unique: true,
@@ -48,7 +62,7 @@ export const Workshop: CollectionConfig = {
             relationTo: 'users',
             hasMany: true,
             filterOptions: {
-                role: { in: ['instructor', 'superadmin'] },
+                role: { in: ['instructor', 'admin', 'superadmin'] },
             },
             admin: {
                 position: 'sidebar',

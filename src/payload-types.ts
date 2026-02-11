@@ -71,6 +71,7 @@ export interface Config {
     companies: Company;
     media: Media;
     videos: Video;
+    announcements: Announcement;
     courses: Course;
     batches: Batch;
     workshops: Workshop;
@@ -83,6 +84,7 @@ export interface Config {
     'course-modules': CourseModule;
     lessons: Lesson;
     'course-progress': CourseProgress;
+    'lesson-notes': LessonNote;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -94,6 +96,7 @@ export interface Config {
     companies: CompaniesSelect<false> | CompaniesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
+    announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
     courses: CoursesSelect<false> | CoursesSelect<true>;
     batches: BatchesSelect<false> | BatchesSelect<true>;
     workshops: WorkshopsSelect<false> | WorkshopsSelect<true>;
@@ -106,6 +109,7 @@ export interface Config {
     'course-modules': CourseModulesSelect<false> | CourseModulesSelect<true>;
     lessons: LessonsSelect<false> | LessonsSelect<true>;
     'course-progress': CourseProgressSelect<false> | CourseProgressSelect<true>;
+    'lesson-notes': LessonNotesSelect<false> | LessonNotesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -154,6 +158,12 @@ export interface User {
   batch?: (number | null) | Batch;
   googleId?: string | null;
   imageUrl?: string | null;
+  streak?: number | null;
+  points?: number | null;
+  lastQuizDate?: string | null;
+  activeSessionId?: string | null;
+  lastIP?: string | null;
+  lastLogin?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -326,11 +336,26 @@ export interface Video {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "announcements".
+ */
+export interface Announcement {
+  id: number;
+  title: string;
+  message: string;
+  type: 'info' | 'alert' | 'success';
+  target: 'all' | 'batch';
+  batch?: (number | null) | Batch;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "workshops".
  */
 export interface Workshop {
   id: number;
   title: string;
+  status: 'upcoming' | 'open' | 'closed';
   /**
    * Generated from title (editable)
    */
@@ -441,6 +466,10 @@ export interface DailyQuizz {
     };
     [k: string]: unknown;
   };
+  /**
+   * Optional image for the quiz question.
+   */
+  image?: (number | null) | Media;
   type: 'MCQ' | 'MSQ' | 'TEXT' | 'NUMBER';
   options?:
     | {
@@ -701,6 +730,18 @@ export interface CourseProgress {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lesson-notes".
+ */
+export interface LessonNote {
+  id: number;
+  user: number | User;
+  lesson: number | Lesson;
+  content: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -738,6 +779,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'videos';
         value: number | Video;
+      } | null)
+    | ({
+        relationTo: 'announcements';
+        value: number | Announcement;
       } | null)
     | ({
         relationTo: 'courses';
@@ -786,6 +831,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'course-progress';
         value: number | CourseProgress;
+      } | null)
+    | ({
+        relationTo: 'lesson-notes';
+        value: number | LessonNote;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -840,6 +889,12 @@ export interface UsersSelect<T extends boolean = true> {
   batch?: T;
   googleId?: T;
   imageUrl?: T;
+  streak?: T;
+  points?: T;
+  lastQuizDate?: T;
+  activeSessionId?: T;
+  lastIP?: T;
+  lastLogin?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -891,6 +946,19 @@ export interface MediaSelect<T extends boolean = true> {
 export interface VideosSelect<T extends boolean = true> {
   title?: T;
   bunnyVideoId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "announcements_select".
+ */
+export interface AnnouncementsSelect<T extends boolean = true> {
+  title?: T;
+  message?: T;
+  type?: T;
+  target?: T;
+  batch?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -961,6 +1029,7 @@ export interface BatchesSelect<T extends boolean = true> {
  */
 export interface WorkshopsSelect<T extends boolean = true> {
   title?: T;
+  status?: T;
   slug?: T;
   description?: T;
   startDate?: T;
@@ -1024,6 +1093,7 @@ export interface DailyQuizzesSelect<T extends boolean = true> {
   batch?: T;
   module?: T;
   question?: T;
+  image?: T;
   type?: T;
   options?:
     | T
@@ -1206,6 +1276,17 @@ export interface CourseProgressSelect<T extends boolean = true> {
   lesson?: T;
   status?: T;
   completedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lesson-notes_select".
+ */
+export interface LessonNotesSelect<T extends boolean = true> {
+  user?: T;
+  lesson?: T;
+  content?: T;
   updatedAt?: T;
   createdAt?: T;
 }
