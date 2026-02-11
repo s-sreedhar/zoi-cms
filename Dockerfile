@@ -50,6 +50,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/src/migrations ./src/migrations
 COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
 COPY --from=builder --chown=nextjs:nodejs /app/src/payload.config.ts ./src/payload.config.ts
+COPY --from=builder --chown=nextjs:nodejs /app/src/importMap.js ./src/importMap.js
 
 USER nextjs
 

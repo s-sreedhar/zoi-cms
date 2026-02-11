@@ -341,6 +341,10 @@ gcloud sql backups restore BACKUP_ID \
 | `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:pass@localhost:5432/db` |
 | `PAYLOAD_SECRET` | Secret key for Payload (min 32 chars) | `your-secret-minimum-32-characters` |
 | `NODE_ENV` | Environment mode | `production` or `development` |
+| `R2_ACCOUNT_ID` | Cloudflare R2 account ID (Required for uploads) | `abc123...` |
+| `R2_ACCESS_KEY_ID` | R2 access key | `xyz...` |
+| `R2_SECRET_ACCESS_KEY` | R2 secret key | `***` |
+| `R2_BUCKET_NAME` | R2 bucket name | `zoi-assets` |
 
 ### Optional Variables
 
