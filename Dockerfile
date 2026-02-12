@@ -71,4 +71,8 @@ LABEL org.opencontainers.image.vendor="Nuat Labs"
 # This ensures that the database schema is up to date with the code
 # We use ; instead of && to ensure the server starts even if migrations log a warning or have a minor issue, 
 # though fatal migration errors should still be addressed.
-CMD ["sh", "-c", "echo \"Starting Payload CMS on port ${PORT:-8080}...\" && npm run migrate; echo \"Starting Next.js server...\" && PORT=${PORT:-8080} node server.js"]
+# Run migrations before starting the server.
+# Using '|| true' ensures that even if migrations report an error (like a locked table 
+# or a partial failure), the server will still attempt to start and listen on the port, 
+# preventing Cloud Run from killing the instance immediately.
+CMD ["sh", "-c", "echo \"[STARTUP] Initializing Payload CMS on port ${PORT:-8080}...\" && (npm run migrate || echo \"[WARNING] Migrations encountered an issue, check logs. Continuing startup...\") && echo \"[STARTUP] Starting Next.js server...\" && PORT=${PORT:-8080} node server.js"]
