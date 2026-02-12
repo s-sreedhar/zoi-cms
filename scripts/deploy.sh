@@ -106,7 +106,7 @@ gcloud run jobs deploy "${MIGRATION_JOB}" \
   --image "${IMAGE_TAG}" \
   --region "${REGION}" \
   --set-cloudsql-instances="${SQL_INSTANCE}" \
-  --set-env-vars "DATABASE_URL=${DATABASE_URL},PAYLOAD_SECRET=${PAYLOAD_SECRET},NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts,PAYLOAD_PUBLIC_SERVER_URL=https://${SERVICE}-991931824365.${REGION}.run.app" \
+  --set-env-vars "DATABASE_URL=${DATABASE_URL},PAYLOAD_SECRET=${PAYLOAD_SECRET},NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts,PAYLOAD_PUBLIC_SERVER_URL=${FINAL_SERVER_URL}" \
   --max-retries 0 \
   --task-timeout 10m \
   --memory 1Gi \
@@ -119,6 +119,9 @@ echo -e "${GREEN}✅ Migration job deployed${NC}"
 # Step 3: Run Migrations
 echo ""
 echo -e "${BLUE}🚀 Step 3/4: Running migrations...${NC}"
+# Use provided URL or dynamically construct it
+FINAL_SERVER_URL="${PAYLOAD_PUBLIC_SERVER_URL:-https://${SERVICE}-991931824365.${REGION}.run.app}"
+
 if gcloud run jobs execute "${MIGRATION_JOB}" --region "${REGION}" --wait; then
   echo -e "${GREEN}✅ Migrations completed successfully${NC}"
 else
@@ -152,7 +155,7 @@ gcloud run deploy "${SERVICE}" \
   --region "${REGION}" \
   --allow-unauthenticated \
   --add-cloudsql-instances="${SQL_INSTANCE}" \
-  --set-env-vars "DATABASE_URL=${DATABASE_URL},PAYLOAD_SECRET=${PAYLOAD_SECRET},NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts,PAYLOAD_PUBLIC_SERVER_URL=https://${SERVICE}-991931824365.${REGION}.run.app,BUNNY_API_KEY=${BUNNY_API_KEY},BUNNY_LIBRARY_ID=${BUNNY_LIBRARY_ID},BUNNY_CDN_HOSTNAME=${BUNNY_CDN_HOSTNAME}" \
+  --set-env-vars "DATABASE_URL=${DATABASE_URL},PAYLOAD_SECRET=${PAYLOAD_SECRET},NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts,PAYLOAD_PUBLIC_SERVER_URL=${FINAL_SERVER_URL},BUNNY_API_KEY=${BUNNY_API_KEY},BUNNY_LIBRARY_ID=${BUNNY_LIBRARY_ID},BUNNY_CDN_HOSTNAME=${BUNNY_CDN_HOSTNAME}" \
   --memory 2Gi \
   --cpu 2 \
   --min-instances 0 \

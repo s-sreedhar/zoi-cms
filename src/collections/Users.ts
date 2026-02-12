@@ -10,24 +10,24 @@ export const Users: CollectionConfig = {
   hooks: {
     afterLogin: [
       async ({ req, user }) => {
-        const sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        const ip = req.headers.get('x-forwarded-for') || 'unknown';
+        const ip = req.headers.get('x-forwarded-for') || 'unknown'
 
-        await req.payload.update({
-          collection: 'users',
-          id: user.id,
-          data: {
-            activeSessionId: sessionId,
-            lastIP: ip,
-            lastLogin: new Date().toISOString()
-          }
-        });
+        // Update session info in the background to prevent login timeout
+        req.payload
+          .update({
+            collection: 'users',
+            id: user.id,
+            data: {
+              activeSessionId: Math.random().toString(36).substring(2, 15),
+              lastIP: ip,
+              lastLogin: new Date().toISOString(),
+            },
+          })
+          .catch((err) => {
+            req.payload.logger.error(`Failed to update user session info: ${err.message}`)
+          })
 
-        // We can't easily modify the response from afterLogin for Local API directly in types,
-        // but for REST it will be merged if we are careful or we just rely on frontend fetching profile.
-        // Actually, Payload returns the user object in the login response.
-        // By updating the user object in the DB, the returned user might have it.
-        return user;
+        return user
       }
     ]
   },

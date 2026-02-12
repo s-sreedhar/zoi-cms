@@ -25,6 +25,7 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { CorrectAnswerSelect as CorrectAnswerSelect_2fe523c50eca4fc1fb9c43db422bbf4f } from '../../../../src/components/CorrectAnswerSelect'
 import { CMSIcon as CMSIcon_354793b6c7ea36cbc351e0253f3946e8 } from '../../../../src/components/CMSLogo'
 import { CMSLogo as CMSLogo_354793b6c7ea36cbc351e0253f3946e8 } from '../../../../src/components/CMSLogo'
+import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { default as default_0db40edc3177d0c3b10a852925d79ee3 } from '../../../../src/components/AdminDashboard'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
@@ -56,6 +57,7 @@ export const importMap = {
   "/src/components/CorrectAnswerSelect#CorrectAnswerSelect": CorrectAnswerSelect_2fe523c50eca4fc1fb9c43db422bbf4f,
   "/src/components/CMSLogo#CMSIcon": CMSIcon_354793b6c7ea36cbc351e0253f3946e8,
   "/src/components/CMSLogo#CMSLogo": CMSLogo_354793b6c7ea36cbc351e0253f3946e8,
+  "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "/src/components/AdminDashboard#default": default_0db40edc3177d0c3b10a852925d79ee3,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
