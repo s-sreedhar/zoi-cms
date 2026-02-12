@@ -47,11 +47,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copy node_modules for Payload CLI (needed for migrations)
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 
-# Copy migration files and scripts for Cloud Run Jobs
-COPY --from=builder --chown=nextjs:nodejs /app/src/migrations ./src/migrations
+# Copy scripts and source for migrations
 COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
-COPY --from=builder --chown=nextjs:nodejs /app/src/payload.config.ts ./src/payload.config.ts
-COPY --from=builder --chown=nextjs:nodejs /app/src/app/\(payload\)/admin/importMap.js ./src/app/\(payload\)/admin/importMap.js
+COPY --from=builder --chown=nextjs:nodejs /app/src ./src
 
 USER nextjs
 
