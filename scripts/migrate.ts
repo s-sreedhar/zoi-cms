@@ -38,7 +38,7 @@ async function runMigrations() {
         console.log('Initializing Payload...')
 
         // Dynamically import config to ensure env vars are loaded first
-        const { default: config } = await import('../src/payload.config.js')
+        const { default: config } = await import('../src/payload.config.ts')
 
         // Initialize Payload with the config
         const payload = await getPayload({ config })

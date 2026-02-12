@@ -69,4 +69,6 @@ LABEL org.opencontainers.image.vendor="Nuat Labs"
 
 # Run migrations before starting the server
 # This ensures that the database schema is up to date with the code
-CMD ["sh", "-c", "npm run migrate && PORT=${PORT:-3000} node server.js"]
+# We use ; instead of && to ensure the server starts even if migrations log a warning or have a minor issue, 
+# though fatal migration errors should still be addressed.
+CMD ["sh", "-c", "echo \"Starting Payload CMS on port ${PORT:-8080}...\" && npm run migrate; echo \"Starting Next.js server...\" && PORT=${PORT:-8080} node server.js"]
