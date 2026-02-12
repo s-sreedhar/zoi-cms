@@ -106,7 +106,7 @@ gcloud run jobs deploy "${MIGRATION_JOB}" \
   --image "${IMAGE_TAG}" \
   --region "${REGION}" \
   --set-cloudsql-instances="${SQL_INSTANCE}" \
-  --set-env-vars "DATABASE_URL=${DATABASE_URL},PAYLOAD_SECRET=${PAYLOAD_SECRET},NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts,PAYLOAD_PUBLIC_SERVER_URL=https://${SERVICE}-991931824365.${REGION}.a.run.app" \
+  --set-env-vars "DATABASE_URL=${DATABASE_URL},PAYLOAD_SECRET=${PAYLOAD_SECRET},NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts,PAYLOAD_PUBLIC_SERVER_URL=https://${SERVICE}-991931824365.${REGION}.run.app" \
   --max-retries 0 \
   --task-timeout 10m \
   --memory 1Gi \
@@ -152,7 +152,7 @@ gcloud run deploy "${SERVICE}" \
   --region "${REGION}" \
   --allow-unauthenticated \
   --add-cloudsql-instances="${SQL_INSTANCE}" \
-  --set-env-vars "DATABASE_URL=${DATABASE_URL},PAYLOAD_SECRET=${PAYLOAD_SECRET},NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts,PAYLOAD_PUBLIC_SERVER_URL=https://${SERVICE}-991931824365.${REGION}.a.run.app,BUNNY_API_KEY=${BUNNY_API_KEY},BUNNY_LIBRARY_ID=${BUNNY_LIBRARY_ID},BUNNY_CDN_HOSTNAME=${BUNNY_CDN_HOSTNAME}" \
+  --set-env-vars "DATABASE_URL=${DATABASE_URL},PAYLOAD_SECRET=${PAYLOAD_SECRET},NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts,PAYLOAD_PUBLIC_SERVER_URL=https://${SERVICE}-991931824365.${REGION}.run.app,BUNNY_API_KEY=${BUNNY_API_KEY},BUNNY_LIBRARY_ID=${BUNNY_LIBRARY_ID},BUNNY_CDN_HOSTNAME=${BUNNY_CDN_HOSTNAME}" \
   --memory 2Gi \
   --cpu 2 \
   --min-instances 0 \

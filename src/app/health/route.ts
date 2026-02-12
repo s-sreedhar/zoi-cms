@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
 
-export async function GET() {
-    return NextResponse.redirect(new URL('/api/health', process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:8080'))
+export async function GET(req: Request) {
+    return NextResponse.redirect(new URL('/api/health', req.url))
 }
