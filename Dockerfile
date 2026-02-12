@@ -53,7 +53,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/src ./src
 
 USER nextjs
 
-EXPOSE 3000
+
 
 
 ENV HOSTNAME="0.0.0.0"
@@ -69,4 +69,4 @@ LABEL org.opencontainers.image.vendor="Nuat Labs"
 
 # Run migrations before starting the server
 # This ensures that the database schema is up to date with the code
-CMD ["sh", "-c", "npm run migrate && node server.js"]
+CMD ["sh", "-c", "npm run migrate && PORT=${PORT:-3000} node server.js"]
