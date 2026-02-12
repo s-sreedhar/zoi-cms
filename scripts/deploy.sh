@@ -76,12 +76,16 @@ echo "   Image Tag:        ${IMAGE_TAG}"
 echo "   SQL Instance:     ${SQL_INSTANCE}"
 echo ""
 
-# Confirm deployment
-read -p "$(echo -e ${YELLOW}Continue with deployment? [y/N]: ${NC})" -n 1 -r
-echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-  echo -e "${RED}Deployment cancelled${NC}"
-  exit 0
+# Confirm deployment (skip if CI is set)
+if [ "$CI" != "true" ]; then
+  read -p "$(echo -e ${YELLOW}Continue with deployment? [y/N]: ${NC})" -n 1 -r
+  echo
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo -e "${RED}Deployment cancelled${NC}"
+    exit 0
+  fi
+else
+  echo -e "${YELLOW}CI environment detected, skipping confirmation...${NC}"
 fi
 
 # Step 1: Build and Push Docker Image
@@ -102,7 +106,7 @@ gcloud run jobs deploy "${MIGRATION_JOB}" \
   --image "${IMAGE_TAG}" \
   --region "${REGION}" \
   --set-cloudsql-instances="${SQL_INSTANCE}" \
-  --set-env-vars "DATABASE_URL=${DATABASE_URL},PAYLOAD_SECRET=${PAYLOAD_SECRET},NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts" \
+  --set-env-vars "DATABASE_URL=${DATABASE_URL},PAYLOAD_SECRET=${PAYLOAD_SECRET},NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts,PAYLOAD_PUBLIC_SERVER_URL=https://${SERVICE}-991931824365.${REGION}.a.run.app" \
   --max-retries 0 \
   --task-timeout 10m \
   --memory 1Gi \
@@ -148,7 +152,7 @@ gcloud run deploy "${SERVICE}" \
   --region "${REGION}" \
   --allow-unauthenticated \
   --add-cloudsql-instances="${SQL_INSTANCE}" \
-  --set-env-vars "DATABASE_URL=${DATABASE_URL},PAYLOAD_SECRET=${PAYLOAD_SECRET},NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts,BUNNY_API_KEY=${BUNNY_API_KEY},BUNNY_LIBRARY_ID=${BUNNY_LIBRARY_ID},BUNNY_CDN_HOSTNAME=${BUNNY_CDN_HOSTNAME}" \
+  --set-env-vars "DATABASE_URL=${DATABASE_URL},PAYLOAD_SECRET=${PAYLOAD_SECRET},NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts,PAYLOAD_PUBLIC_SERVER_URL=https://${SERVICE}-991931824365.${REGION}.a.run.app,BUNNY_API_KEY=${BUNNY_API_KEY},BUNNY_LIBRARY_ID=${BUNNY_LIBRARY_ID},BUNNY_CDN_HOSTNAME=${BUNNY_CDN_HOSTNAME}" \
   --memory 2Gi \
   --cpu 2 \
   --min-instances 0 \
