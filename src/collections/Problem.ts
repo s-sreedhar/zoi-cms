@@ -25,25 +25,17 @@ export const Problem: CollectionConfig = {
                 { label: 'Hard', value: 'Hard' },
             ],
             defaultValue: 'Medium',
+            required: true,
         },
         {
             name: 'template',
-            type: 'code',
-            admin: {
-                language: 'javascript',
-            },
+            type: 'richText',
         },
         {
             name: 'testbench',
-            type: 'code',
-            admin: {
-                language: 'javascript',
-            },
+            type: 'richText',
         },
-        {
-            name: 'testCases',
-            type: 'json',
-        },
+
         {
             name: 'companyTags',
             type: 'relationship',

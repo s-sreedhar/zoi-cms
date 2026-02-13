@@ -1,6 +1,8 @@
 import type { CollectionConfig } from 'payload'
 import formatSlug from '../utils/formatSlug'
 
+
+
 export const Batch: CollectionConfig = {
     slug: 'batches',
     admin: {
@@ -23,6 +25,12 @@ export const Batch: CollectionConfig = {
             admin: {
                 position: 'sidebar',
                 description: 'Generated from name (editable)',
+                components: {
+                    Field: '/src/components/SlugField',
+                },
+            },
+            custom: {
+                watchField: 'name',
             },
             hooks: {
                 beforeValidate: [formatSlug('name')],

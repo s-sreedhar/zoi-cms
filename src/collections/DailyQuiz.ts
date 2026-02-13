@@ -1,12 +1,20 @@
 import type { CollectionConfig } from 'payload'
+import formatSlug from '../utils/formatSlug'
+
+
 
 export const DailyQuiz: CollectionConfig = {
     slug: 'daily-quizzes',
     admin: {
-        useAsTitle: 'date',
-        defaultColumns: ['date', 'question', 'batch', 'module'],
+        useAsTitle: 'title',
+        defaultColumns: ['title', 'date', 'batch', 'module'],
     },
     fields: [
+        {
+            name: 'title',
+            type: 'text',
+            required: true,
+        },
         {
             name: 'date',
             type: 'date',
@@ -15,6 +23,21 @@ export const DailyQuiz: CollectionConfig = {
                 date: {
                     pickerAppearance: 'dayOnly',
                 },
+            },
+        },
+        {
+            name: 'slug',
+            type: 'text',
+            unique: true,
+            required: true,
+            admin: {
+                description: 'Generated from title (editable)',
+                components: {
+                    Field: '/src/components/SlugField',
+                },
+            },
+            custom: {
+                watchField: 'title',
             },
         },
         {
@@ -28,6 +51,10 @@ export const DailyQuiz: CollectionConfig = {
             type: 'relationship',
             relationTo: 'course-modules',
             required: true,
+        },
+        {
+            name: 'description',
+            type: 'richText',
         },
         {
             name: 'question',

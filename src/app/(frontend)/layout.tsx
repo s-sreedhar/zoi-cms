@@ -6,13 +6,17 @@ export const metadata = {
   title: 'Payload Blank Template',
 }
 
+import { AuthProvider } from '../../providers/AuthProvider'
+
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
 
   return (
     <html lang="en">
       <body>
-        <main>{children}</main>
+        <AuthProvider>
+          <main className="pt-16 min-h-screen bg-gray-50">{children}</main>
+        </AuthProvider>
       </body>
     </html>
   )

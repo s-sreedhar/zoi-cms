@@ -92,10 +92,6 @@ export const Lesson: CollectionConfig = {
     },
     fields: [
         {
-            name: 'temp_trigger',
-            type: 'text',
-        },
-        {
             name: 'title',
             type: 'text',
             required: true,
@@ -105,6 +101,15 @@ export const Lesson: CollectionConfig = {
             type: 'relationship',
             relationTo: 'course-modules',
             required: true,
+        },
+        {
+            name: 'batch',
+            type: 'relationship',
+            relationTo: 'batches',
+            hasMany: true,
+            admin: {
+                description: 'Select batches that can access this lesson',
+            },
         },
         {
             name: 'order',

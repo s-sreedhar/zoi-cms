@@ -37,6 +37,14 @@ export const Users: CollectionConfig = {
       type: 'text',
     },
     {
+      name: 'googleId',
+      type: 'text',
+      admin: {
+        hidden: true,
+      },
+      index: true,
+    },
+    {
       name: 'role',
       type: 'select',
       options: [
@@ -57,14 +65,7 @@ export const Users: CollectionConfig = {
       type: 'relationship',
       relationTo: 'batches',
     },
-    {
-      name: 'googleId',
-      type: 'text',
-      admin: {
-        readOnly: true,
-      },
-      index: true,
-    },
+
     {
       name: 'imageUrl',
       type: 'text',

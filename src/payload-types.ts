@@ -153,10 +153,10 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   displayName?: string | null;
+  googleId?: string | null;
   role: 'superadmin' | 'customer' | 'instructor' | 'admin';
   phoneNumber?: string | null;
   batch?: (number | null) | Batch;
-  googleId?: string | null;
   imageUrl?: string | null;
   streak?: number | null;
   points?: number | null;
@@ -386,7 +386,25 @@ export interface Workshop {
 export interface Quiz {
   id: number;
   title: string;
-  description?: string | null;
+  /**
+   * Generated from title (editable)
+   */
+  slug: string;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   isTemplate?: boolean | null;
   questions?:
     | {
@@ -448,9 +466,29 @@ export interface Quiz {
  */
 export interface DailyQuizz {
   id: number;
+  title: string;
   date: string;
+  /**
+   * Generated from title (editable)
+   */
+  slug: string;
   batch: number | Batch;
   module: number | CourseModule;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   question: {
     root: {
       type: string;
@@ -511,6 +549,10 @@ export interface CourseModule {
   title: string;
   description?: string | null;
   course: number | Course;
+  /**
+   * Select batches that can access this module
+   */
+  batch?: (number | Batch)[] | null;
   order?: number | null;
   updatedAt: string;
   createdAt: string;
@@ -537,18 +579,37 @@ export interface Problem {
     };
     [k: string]: unknown;
   };
-  difficulty?: ('Easy' | 'Medium' | 'Hard') | null;
-  template?: string | null;
-  testbench?: string | null;
-  testCases?:
-    | {
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+  template?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
         [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  testbench?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   companyTags?: (number | Company)[] | null;
   updatedAt: string;
   createdAt: string;
@@ -560,6 +621,7 @@ export interface Problem {
 export interface Session {
   id: number;
   title: string;
+  batch?: (number | null) | Batch;
   quiz: number | Quiz;
   host: number | User;
   status: 'WAITING' | 'ACTIVE' | 'FINISHED';
@@ -643,9 +705,12 @@ export interface Lead {
  */
 export interface Lesson {
   id: number;
-  temp_trigger?: string | null;
   title: string;
   module: number | CourseModule;
+  /**
+   * Select batches that can access this lesson
+   */
+  batch?: (number | Batch)[] | null;
   order?: number | null;
   topics?:
     | {
@@ -736,7 +801,25 @@ export interface LessonNote {
   id: number;
   user: number | User;
   lesson: number | Lesson;
-  content: string;
+  /**
+   * Optional: Restrict note to specific batch
+   */
+  batch?: (number | null) | Batch;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -884,10 +967,10 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   displayName?: T;
+  googleId?: T;
   role?: T;
   phoneNumber?: T;
   batch?: T;
-  googleId?: T;
   imageUrl?: T;
   streak?: T;
   points?: T;
@@ -1056,6 +1139,7 @@ export interface WorkshopsSelect<T extends boolean = true> {
  */
 export interface QuizzesSelect<T extends boolean = true> {
   title?: T;
+  slug?: T;
   description?: T;
   isTemplate?: T;
   questions?:
@@ -1089,9 +1173,12 @@ export interface QuizzesSelect<T extends boolean = true> {
  * via the `definition` "daily-quizzes_select".
  */
 export interface DailyQuizzesSelect<T extends boolean = true> {
+  title?: T;
   date?: T;
+  slug?: T;
   batch?: T;
   module?: T;
+  description?: T;
   question?: T;
   image?: T;
   type?: T;
@@ -1116,7 +1203,6 @@ export interface ProblemsSelect<T extends boolean = true> {
   difficulty?: T;
   template?: T;
   testbench?: T;
-  testCases?: T;
   companyTags?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1127,6 +1213,7 @@ export interface ProblemsSelect<T extends boolean = true> {
  */
 export interface SessionsSelect<T extends boolean = true> {
   title?: T;
+  batch?: T;
   quiz?: T;
   host?: T;
   status?: T;
@@ -1199,6 +1286,7 @@ export interface CourseModulesSelect<T extends boolean = true> {
   title?: T;
   description?: T;
   course?: T;
+  batch?: T;
   order?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1208,9 +1296,9 @@ export interface CourseModulesSelect<T extends boolean = true> {
  * via the `definition` "lessons_select".
  */
 export interface LessonsSelect<T extends boolean = true> {
-  temp_trigger?: T;
   title?: T;
   module?: T;
+  batch?: T;
   order?: T;
   topics?:
     | T
@@ -1286,6 +1374,7 @@ export interface CourseProgressSelect<T extends boolean = true> {
 export interface LessonNotesSelect<T extends boolean = true> {
   user?: T;
   lesson?: T;
+  batch?: T;
   content?: T;
   updatedAt?: T;
   createdAt?: T;

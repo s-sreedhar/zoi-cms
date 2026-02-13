@@ -1,5 +1,7 @@
 import { PayloadHandler } from 'payload'
-import { CollectionConfig } from 'payload'
+import { OAuth2Client } from 'google-auth-library'
+
+const client = new OAuth2Client(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID)
 
 export const googleOauthHandler: PayloadHandler = async (req) => {
     const { payload } = req
@@ -11,14 +13,17 @@ export const googleOauthHandler: PayloadHandler = async (req) => {
 
     try {
         // 1. Verify Google Token
-        const googleRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${token}`)
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+        })
+        const payloadData = ticket.getPayload()
 
-        if (!googleRes.ok) {
+        if (!payloadData) {
             return Response.json({ error: 'Invalid Google token' }, { status: 401 })
         }
 
-        const googleData = await googleRes.json()
-        const { email, name, sub, picture } = googleData
+        const { email, name, sub, picture } = payloadData
 
         console.log('Google Auth Data:', { email, name, sub, picture })
 

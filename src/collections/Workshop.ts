@@ -1,6 +1,8 @@
 import type { CollectionConfig } from 'payload'
 import formatSlug from '../utils/formatSlug'
 
+
+
 export const Workshop: CollectionConfig = {
     slug: 'workshops',
     admin: {
@@ -37,6 +39,12 @@ export const Workshop: CollectionConfig = {
             admin: {
                 position: 'sidebar',
                 description: 'Generated from title (editable)',
+                components: {
+                    Field: '/src/components/SlugField',
+                },
+            },
+            custom: {
+                watchField: 'title',
             },
             hooks: {
                 beforeValidate: [formatSlug('title')],

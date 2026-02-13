@@ -22,6 +22,15 @@ export const CourseModule: CollectionConfig = {
             required: true,
         },
         {
+            name: 'batch',
+            type: 'relationship',
+            relationTo: 'batches',
+            hasMany: true,
+            admin: {
+                description: 'Select batches that can access this module',
+            },
+        },
+        {
             name: 'order',
             type: 'number',
         },

@@ -1,4 +1,7 @@
 import type { CollectionConfig } from 'payload'
+import formatSlug from '../utils/formatSlug'
+
+
 
 export const Quiz: CollectionConfig = {
     slug: 'quizzes',
@@ -12,8 +15,23 @@ export const Quiz: CollectionConfig = {
             required: true,
         },
         {
+            name: 'slug',
+            type: 'text',
+            unique: true,
+            required: true,
+            admin: {
+                description: 'Generated from title (editable)',
+                components: {
+                    Field: '/src/components/SlugField',
+                },
+            },
+            custom: {
+                watchField: 'title',
+            },
+        },
+        {
             name: 'description',
-            type: 'textarea',
+            type: 'richText',
         },
         {
             name: 'isTemplate',

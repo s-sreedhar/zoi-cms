@@ -1,4 +1,5 @@
 import { BunnyVideoUpload as BunnyVideoUpload_83e334dd1edbbc604ce20ab3f856bdd2 } from '../../../../src/components/BunnyVideoUpload'
+import { default as default_5f5e661a38d0f2fc9e63fb5908bbddfe } from '../../../../src/components/SlugField'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -31,6 +32,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 
 export const importMap = {
   "/src/components/BunnyVideoUpload#BunnyVideoUpload": BunnyVideoUpload_83e334dd1edbbc604ce20ab3f856bdd2,
+  "/src/components/SlugField#default": default_5f5e661a38d0f2fc9e63fb5908bbddfe,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,

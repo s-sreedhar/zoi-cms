@@ -41,8 +41,16 @@ export const LessonNotes: CollectionConfig = {
             required: true,
         },
         {
+            name: 'batch',
+            type: 'relationship',
+            relationTo: 'batches',
+            admin: {
+                description: 'Optional: Restrict note to specific batch',
+            },
+        },
+        {
             name: 'content',
-            type: 'textarea',
+            type: 'richText',
             required: true,
         },
     ],

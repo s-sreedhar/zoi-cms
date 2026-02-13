@@ -12,6 +12,11 @@ export const Session: CollectionConfig = {
             required: true,
         },
         {
+            name: 'batch',
+            type: 'relationship',
+            relationTo: 'batches',
+        },
+        {
             name: 'quiz',
             type: 'relationship',
             relationTo: 'quizzes',

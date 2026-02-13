@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import formatSlug from '../utils/formatSlug'
 
+
 export const Course: CollectionConfig = {
     slug: 'courses',
     admin: {
@@ -20,6 +21,12 @@ export const Course: CollectionConfig = {
             admin: {
                 position: 'sidebar',
                 description: 'Generated from title (editable)',
+                components: {
+                    Field: '/src/components/SlugField',
+                },
+            },
+            custom: {
+                watchField: 'title',
             },
             hooks: {
                 beforeValidate: [formatSlug('title')],
