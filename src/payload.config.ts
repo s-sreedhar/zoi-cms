@@ -36,7 +36,21 @@ export default buildConfig({
   admin: {
     user: Users.slug,
     meta: {
-      titleSuffix: '- NUAT Labs CMS',
+      titleSuffix: '- Zoi Admin',
+      icons: [
+        {
+          rel: 'icon',
+          type: 'image/png',
+          url: '/zoi.png',
+        },
+      ],
+      openGraph: {
+        images: [
+          {
+            url: '/zoi.png',
+          },
+        ],
+      },
     },
     components: {
       graphics: {

@@ -60,6 +60,7 @@
     "playwright": "1.56.1",
     "playwright-core": "1.56.1",
     "prettier": "^3.4.2",
+    "split2": "^4.2.0",
     "tsx": "4.21.0",
     "typescript": "5.7.3",
     "vite-tsconfig-paths": "6.0.5",

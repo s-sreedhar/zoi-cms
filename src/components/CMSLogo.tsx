@@ -5,7 +5,7 @@ export const CMSLogo = () => {
         <div className="cms-logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <img
                 src="/zoi.png"
-                alt="NUAT Labs Logo"
+                alt="Zoi Logo"
                 style={{
                     width: 'auto',
                     height: '40px',
@@ -20,7 +20,7 @@ export const CMSLogo = () => {
                     color: 'var(--theme-elevation-800)',
                 }}
             >
-                NUAT Labs
+                Zoi
             </span>
         </div>
     )
@@ -31,7 +31,7 @@ export const CMSIcon = () => {
         <div className="cms-icon">
             <img
                 src="/zoi.png"
-                alt="NUAT Labs Icon"
+                alt="Zoi Icon"
                 style={{
                     width: '32px',
                     height: '32px',
