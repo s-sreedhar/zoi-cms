@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload'
-import { googleOauthHandler } from '../endpoints/oauth'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -35,14 +34,6 @@ export const Users: CollectionConfig = {
     {
       name: 'displayName',
       type: 'text',
-    },
-    {
-      name: 'googleId',
-      type: 'text',
-      admin: {
-        hidden: true,
-      },
-      index: true,
     },
     {
       name: 'role',
@@ -117,13 +108,6 @@ export const Users: CollectionConfig = {
       admin: {
         readOnly: true,
       },
-    },
-  ],
-  endpoints: [
-    {
-      path: '/oauth/google',
-      method: 'post',
-      handler: googleOauthHandler,
     },
   ],
 }
