@@ -240,29 +240,59 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ]
 
   for (const { table, column } of collections) {
+    // 1. Ensure column is JSONB (Safe conversion from Text/Varchar if needed)
+    await db.execute(sql`
+       ALTER TABLE "${sql.raw(table)}" 
+       ALTER COLUMN "${sql.raw(column)}" TYPE jsonb 
+       USING CASE 
+         WHEN "${sql.raw(column)}"::text ~ '^\s*[\{\[]' THEN "${sql.raw(column)}"::jsonb
+         WHEN "${sql.raw(column)}" IS NULL THEN NULL
+         ELSE jsonb_build_object(
+            'root', jsonb_build_object(
+              'type', 'root',
+              'children', jsonb_build_array(
+                jsonb_build_object(
+                  'type', 'paragraph',
+                  'children', jsonb_build_array(
+                    jsonb_build_object(
+                      'type', 'text',
+                      'text', "${sql.raw(column)}"::text, 
+                      'version', 1
+                    )
+                  ),
+                  'version', 1
+                )
+              ),
+              'version', 1
+            )
+          )
+       END
+    `)
+
+    // 2. Repair existing JSONB structure (e.g. Arrays -> Root Object)
     await db.execute(sql`
        UPDATE "${sql.raw(table)}" 
        SET "${sql.raw(column)}" = CASE
          WHEN jsonb_typeof("${sql.raw(column)}") = 'object' AND "${sql.raw(column)}" ? 'root' THEN "${sql.raw(column)}"
          WHEN jsonb_typeof("${sql.raw(column)}") = 'array' THEN jsonb_build_object(
-           'root', jsonb_build_object(
-             'type', 'root',
-             'children', jsonb_build_array(
-               jsonb_build_object(
-                 'type', 'paragraph',
-                 'children', jsonb_build_array(
-                   jsonb_build_object(
-                     'type', 'text',
-                     'text', COALESCE("${sql.raw(column)}"->0->'children'->0->>'text', ''),
-                     'version', 1
-                   )
-                 ),
-                 'version', 1
-               )
-             ),
-             'version', 1
-           )
-         )
+            'root', jsonb_build_object(
+              'type', 'root',
+              'children', jsonb_build_array(
+                jsonb_build_object(
+                  'type', 'paragraph',
+                  'children', jsonb_build_array(
+                    jsonb_build_object(
+                      'type', 'text',
+                      'text', COALESCE("${sql.raw(column)}"->0->'children'->0->>'text', ''),
+                      'version', 1
+                    )
+                  ),
+                  'version', 1
+                )
+              ),
+              'version', 1
+            )
+          )
          ELSE "${sql.raw(column)}"
        END
        WHERE "${sql.raw(column)}" IS NOT NULL`)
