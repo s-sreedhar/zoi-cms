@@ -153,7 +153,6 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   displayName?: string | null;
-  googleId?: string | null;
   role: 'superadmin' | 'customer' | 'instructor' | 'admin';
   phoneNumber?: string | null;
   batch?: (number | null) | Batch;
@@ -967,7 +966,6 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   displayName?: T;
-  googleId?: T;
   role?: T;
   phoneNumber?: T;
   batch?: T;

@@ -7,6 +7,7 @@ import * as migration_20260211_180430_add_streak_field from './20260211_180430_a
 import * as migration_20260213_192902 from './20260213_192902';
 import * as migration_20260213_195615 from './20260213_195615';
 import * as migration_20260213_201538 from './20260213_201538';
+import * as migration_20260214_fix_lexical_format from './20260214_fix_lexical_format';
 
 export const migrations = [
   {
@@ -53,5 +54,10 @@ export const migrations = [
     up: migration_20260213_201538.up,
     down: migration_20260213_201538.down,
     name: '20260213_201538'
+  },
+  {
+    up: migration_20260214_fix_lexical_format.up,
+    down: migration_20260214_fix_lexical_format.down,
+    name: '20260214_fix_lexical_format'
   },
 ];
