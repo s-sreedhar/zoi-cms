@@ -41,9 +41,11 @@ async function runMigrations() {
         const { default: config } = await import('../src/payload.config')
 
         // Initialize Payload with the config
+        console.log('Fetching Payload instance...')
         const payload = await getPayload({ config })
+        console.log('Payload initialized successfully.')
 
-        console.log('Running migrations...')
+        console.log('Running migrations via payload.db.migrate()...')
 
         // Run migrations - the migrate function only accepts an optional migrations array
         // It uses the config that was already loaded during initialization
