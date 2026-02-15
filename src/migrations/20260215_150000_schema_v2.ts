@@ -2,11 +2,25 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
     await db.execute(sql`
-    CREATE TYPE "public"."enum_announcements_type" AS ENUM('info', 'alert', 'success');
-    CREATE TYPE "public"."enum_announcements_target" AS ENUM('all', 'batch');
-    CREATE TYPE "public"."enum_workshops_status" AS ENUM('upcoming', 'open', 'closed');
-    CREATE TYPE "public"."enum_workshop_registrations_how_did_you_know" AS ENUM('social_media', 'friend', 'college', 'other');
-    CREATE TYPE "public"."enum_lessons_blocks_video_block_video_source" AS ENUM('bunny', 'youtube', 'custom');
+    -- Safe Type Creation
+    DO $$ 
+    BEGIN 
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_announcements_type') THEN
+            CREATE TYPE "public"."enum_announcements_type" AS ENUM('info', 'alert', 'success');
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_announcements_target') THEN
+            CREATE TYPE "public"."enum_announcements_target" AS ENUM('all', 'batch');
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_workshops_status') THEN
+            CREATE TYPE "public"."enum_workshops_status" AS ENUM('upcoming', 'open', 'closed');
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_workshop_registrations_how_did_you_know') THEN
+            CREATE TYPE "public"."enum_workshop_registrations_how_did_you_know" AS ENUM('social_media', 'friend', 'college', 'other');
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_lessons_blocks_video_block_video_source') THEN
+            CREATE TYPE "public"."enum_lessons_blocks_video_block_video_source" AS ENUM('bunny', 'youtube', 'custom');
+        END IF;
+    END $$;
 
     -- Tables that might be missing from consolidated_state
     CREATE TABLE IF NOT EXISTS "announcements" (
@@ -39,7 +53,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
         "created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
     );
 
-    -- Ensure Columns for existsing tables (v2 Sync)
+    -- Ensure Columns for existing tables (v2 Sync)
     DO $$ 
     BEGIN 
         -- Add missing columns to Users
