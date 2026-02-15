@@ -52,7 +52,7 @@ export const Workshop: CollectionConfig = {
         },
         {
             name: 'description',
-            type: 'textarea',
+            type: 'richText',
             required: true,
         },
         {

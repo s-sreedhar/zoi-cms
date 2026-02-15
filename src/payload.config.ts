@@ -1,5 +1,5 @@
 // payload.config.ts
-import { postgresAdapter } from '@payloadcms/db-postgres'
+import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -26,7 +26,6 @@ import { CourseProgress } from './collections/CourseProgress'
 import { Announcement } from './collections/Announcement'
 import { LessonNotes } from './collections/LessonNotes'
 import { WorkshopRegistration } from './collections/WorkshopRegistration'
-import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -71,14 +70,8 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  db: postgresAdapter({
-    pool: {
-      connectionString: process.env.DATABASE_URL || '',
-      max: 10,
-    },
-    migrationDir: path.resolve(dirname, 'migrations'),
-    push: process.env.NODE_ENV !== 'production',
-    prodMigrations: migrations,
+  db: mongooseAdapter({
+    url: process.env.DATABASE_URL || '',
   }),
   cors: [
     'http://localhost:3000',

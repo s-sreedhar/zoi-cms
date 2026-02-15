@@ -47,54 +47,24 @@ jobs:
 
       - name: Deploy Migration Job
         run: |
+          echo "🔄 Deploying/Updating migration job..."
           gcloud run jobs deploy ${{ env.MIGRATION_JOB }} \
             --image ${{ env.IMAGE_TAG }} \
             --region ${{ env.REGION }} \
-            --set-cloudsql-instances=nuatlabs:asia-south1:zoi-sql \
-            --set-env-vars "DATABASE_URL=postgres://zoi_user:Luffy%40123@localhost/zoi-sql-db?host=/cloudsql/nuatlabs:asia-south1:zoi-sql,PAYLOAD_SECRET=7b3c4254c50af606ad681cff,NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts" \
-            --max-retries=0 \
-            --task-timeout=10m \
-            --memory=1Gi \
-            --cpu=1 \
-            --command="node" \
-            --args="node_modules/payload/dist/bin/index.js,migrate"
+            --set-env-vars "DATABASE_URL=${{ secrets.DATABASE_URL }},PAYLOAD_SECRET=${{ secrets.PAYLOAD_SECRET }},NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts" \
+            --max-retries 0 \
+            --task-timeout 10m \
+            --memory 1Gi \
+            --cpu 1 \
+            --command "pnpm" \
+            --args "tsx,scripts/migrate.ts"
 
       - name: Run Migrations
-        id: migrate
-        continue-on-error: true  # prodMigrations handles migrations on app startup
         run: |
-          echo "🔄 Running database migrations via Cloud Run Job..."
-          echo "ℹ️  Note: Migrations also run automatically on app startup via prodMigrations"
-          if gcloud run jobs execute ${{ env.MIGRATION_JOB }} --region ${{ env.REGION }} --wait; then
-            echo "✅ Migration job completed successfully"
-            echo "migration_status=success" >> $GITHUB_OUTPUT
-          else
-            echo "⚠️  Migration job failed, but prodMigrations will handle it on startup"
-            echo "migration_status=failed" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Migration Logs (on failure)
-        if: failure() && steps.migrate.outcome == 'failure'
-        run: |
-          echo "📋 Fetching migration logs..."
-          EXECUTION=$(gcloud run jobs executions list ${{ env.MIGRATION_JOB }} \
+          echo "🚀 Running migrations..."
+          gcloud run jobs execute ${{ env.MIGRATION_JOB }} \
             --region ${{ env.REGION }} \
-            --limit 1 \
-            --sort-by=~createTime \
-            --format="value(metadata.name)") || true
-          
-          if [ -n "$EXECUTION" ]; then
-            echo "📄 Logs for execution: $EXECUTION"
-            gcloud run jobs executions logs read ${{ env.MIGRATION_JOB }} \
-              --region ${{ env.REGION }} \
-              --limit 200 \
-              --execution "$EXECUTION" || true
-          else
-            echo "📄 Latest migration logs:"
-            gcloud run jobs executions logs read ${{ env.MIGRATION_JOB }} \
-              --region ${{ env.REGION }} \
-              --limit 200 || true
-          fi
+            --wait
 
       - name: Deploy to Cloud Run
         id: deploy
@@ -105,8 +75,7 @@ jobs:
             --platform=managed \
             --allow-unauthenticated \
             --region ${{ env.REGION }} \
-            --add-cloudsql-instances=nuatlabs:asia-south1:zoi-sql \
-            --set-env-vars "DATABASE_URL=postgres://zoi_user:Luffy%40123@localhost/zoi-sql-db?host=/cloudsql/nuatlabs:asia-south1:zoi-sql,PAYLOAD_SECRET=7b3c4254c50af606ad681cff,NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts,BUNNY_API_KEY=99635bd7-257a-4108-99ac999b14c3-aa07-4351,BUNNY_LIBRARY_ID=595073,BUNNY_CDN_HOSTNAME=vz-366bcf3a-bc2.b-cdn.net,R2_ACCOUNT_ID=${{ secrets.R2_ACCOUNT_ID }},R2_ACCESS_KEY_ID=${{ secrets.R2_ACCESS_KEY_ID }},R2_SECRET_ACCESS_KEY=${{ secrets.R2_SECRET_ACCESS_KEY }},R2_BUCKET_NAME=${{ secrets.R2_BUCKET_NAME }}" \
+            --set-env-vars "DATABASE_URL=${{ secrets.DATABASE_URL }},PAYLOAD_SECRET=${{ secrets.PAYLOAD_SECRET }},NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts,BUNNY_API_KEY=${{ secrets.BUNNY_API_KEY }},BUNNY_LIBRARY_ID=${{ secrets.BUNNY_LIBRARY_ID }},BUNNY_CDN_HOSTNAME=${{ secrets.BUNNY_CDN_HOSTNAME }},R2_ACCOUNT_ID=${{ secrets.R2_ACCOUNT_ID }},R2_ACCESS_KEY_ID=${{ secrets.R2_ACCESS_KEY_ID }},R2_SECRET_ACCESS_KEY=${{ secrets.R2_SECRET_ACCESS_KEY }},R2_BUCKET_NAME=${{ secrets.R2_BUCKET_NAME }}" \
             --memory=2Gi \
             --cpu=2 \
             --min-instances=0 \
@@ -147,12 +116,12 @@ jobs:
         if: success()
         run: |
           echo "╔════════════════════════════════════════════════════════════╗"
-          echo "║              🎉 Deployment Successful! 🎉                  ║"
+          echo "║              🎉 MongoDB Deployment Successful! 🎉           ║"
           echo "╚════════════════════════════════════════════════════════════╝"
           echo ""
           echo "🌐 Service URL: ${{ steps.get_url.outputs.service_url }}"
           echo "📊 Admin Panel: ${{ steps.get_url.outputs.service_url }}/admin"
           echo ""
-          echo "✅ Migrations: Completed"
+          echo "✅ Database: MongoDB Atlas"
           echo "✅ Deployment: Successful"
           echo "✅ Health Check: Passed"

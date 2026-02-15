@@ -118,7 +118,7 @@ export interface Config {
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: number;
+    defaultIDType: string;
   };
   fallbackLocale: null;
   globals: {};
@@ -153,11 +153,11 @@ export interface UserAuthOperations {
  * via the `definition` "users".
  */
 export interface User {
-  id: number;
+  id: string;
   displayName?: string | null;
   role: 'superadmin' | 'customer' | 'instructor' | 'admin';
   phoneNumber?: string | null;
-  batch?: (number | null) | Batch;
+  batch?: (string | null) | Batch;
   imageUrl?: string | null;
   googleId?: string | null;
   streak?: number | null;
@@ -190,13 +190,13 @@ export interface User {
  * via the `definition` "batches".
  */
 export interface Batch {
-  id: number;
+  id: string;
   name: string;
   /**
    * Generated from name (editable)
    */
   slug: string;
-  course: (number | Course)[];
+  course: (string | Course)[];
   description?: string | null;
   status: 'upcoming' | 'open' | 'in_progress' | 'closed';
   startDate?: string | null;
@@ -207,7 +207,7 @@ export interface Batch {
   originalPrice?: number | null;
   offerTitle?: string | null;
   offerDetails?: string | null;
-  instructors: (number | User)[];
+  instructors: (string | User)[];
   hidden?: boolean | null;
   syllabus?: {
     root: {
@@ -241,13 +241,13 @@ export interface Batch {
   } | null;
   images?:
     | {
-        image?: (number | null) | Media;
+        image?: (string | null) | Media;
         id?: string | null;
       }[]
     | null;
   documents?:
     | {
-        document?: (number | null) | Media;
+        document?: (string | null) | Media;
         id?: string | null;
       }[]
     | null;
@@ -259,7 +259,7 @@ export interface Batch {
  * via the `definition` "courses".
  */
 export interface Course {
-  id: number;
+  id: string;
   title: string;
   /**
    * Generated from title (editable)
@@ -282,13 +282,13 @@ export interface Course {
   };
   images?:
     | {
-        image?: (number | null) | Media;
+        image?: (string | null) | Media;
         id?: string | null;
       }[]
     | null;
   pdfs?:
     | {
-        pdf?: (number | null) | Media;
+        pdf?: (string | null) | Media;
         id?: string | null;
       }[]
     | null;
@@ -301,7 +301,7 @@ export interface Course {
  * via the `definition` "media".
  */
 export interface Media {
-  id: number;
+  id: string;
   alt: string;
   updatedAt: string;
   createdAt: string;
@@ -320,7 +320,7 @@ export interface Media {
  * via the `definition` "companies".
  */
 export interface Company {
-  id: number;
+  id: string;
   name: string;
   updatedAt: string;
   createdAt: string;
@@ -330,7 +330,7 @@ export interface Company {
  * via the `definition` "videos".
  */
 export interface Video {
-  id: number;
+  id: string;
   title: string;
   bunnyVideoId: string;
   updatedAt: string;
@@ -341,12 +341,12 @@ export interface Video {
  * via the `definition` "announcements".
  */
 export interface Announcement {
-  id: number;
+  id: string;
   title: string;
   message: string;
   type: 'info' | 'alert' | 'success';
   target: 'all' | 'batch';
-  batch?: (number | null) | Batch;
+  batch?: (string | null) | Batch;
   updatedAt: string;
   createdAt: string;
 }
@@ -355,27 +355,41 @@ export interface Announcement {
  * via the `definition` "workshops".
  */
 export interface Workshop {
-  id: number;
+  id: string;
   title: string;
   status: 'upcoming' | 'open' | 'closed';
   /**
    * Generated from title (editable)
    */
   slug: string;
-  description: string;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
   startDate: string;
   venue: string;
   endDate?: string | null;
-  instructors: (number | User)[];
+  instructors: (string | User)[];
   images?:
     | {
-        image?: (number | null) | Media;
+        image?: (string | null) | Media;
         id?: string | null;
       }[]
     | null;
   pdfs?:
     | {
-        pdf?: (number | null) | Media;
+        pdf?: (string | null) | Media;
         id?: string | null;
       }[]
     | null;
@@ -387,12 +401,12 @@ export interface Workshop {
  * via the `definition` "workshop-registrations".
  */
 export interface WorkshopRegistration {
-  id: number;
+  id: string;
   name: string;
   rollNumber: string;
   email: string;
   howDidYouKnow: 'social_media' | 'friend' | 'college' | 'other';
-  workshop: number | Workshop;
+  workshop: string | Workshop;
   venue?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -402,7 +416,7 @@ export interface WorkshopRegistration {
  * via the `definition` "quizzes".
  */
 export interface Quiz {
-  id: number;
+  id: string;
   title: string;
   /**
    * Generated from title (editable)
@@ -442,7 +456,7 @@ export interface Quiz {
           };
           [k: string]: unknown;
         };
-        image?: (number | null) | Media;
+        image?: (string | null) | Media;
         options?:
           | {
               option?: string | null;
@@ -483,15 +497,15 @@ export interface Quiz {
  * via the `definition` "daily-quizzes".
  */
 export interface DailyQuizz {
-  id: number;
+  id: string;
   title: string;
   date: string;
   /**
    * Generated from title (editable)
    */
   slug: string;
-  batch: number | Batch;
-  module: number | CourseModule;
+  batch: string | Batch;
+  module: string | CourseModule;
   description?: {
     root: {
       type: string;
@@ -525,7 +539,7 @@ export interface DailyQuizz {
   /**
    * Optional image for the quiz question.
    */
-  image?: (number | null) | Media;
+  image?: (string | null) | Media;
   type: 'MCQ' | 'MSQ' | 'TEXT' | 'NUMBER';
   options?:
     | {
@@ -563,14 +577,14 @@ export interface DailyQuizz {
  * via the `definition` "course-modules".
  */
 export interface CourseModule {
-  id: number;
+  id: string;
   title: string;
   description?: string | null;
-  course: number | Course;
+  course: string | Course;
   /**
    * Select batches that can access this module
    */
-  batch?: (number | Batch)[] | null;
+  batch?: (string | Batch)[] | null;
   order?: number | null;
   updatedAt: string;
   createdAt: string;
@@ -580,7 +594,7 @@ export interface CourseModule {
  * via the `definition` "problems".
  */
 export interface Problem {
-  id: number;
+  id: string;
   title: string;
   description: {
     root: {
@@ -628,7 +642,7 @@ export interface Problem {
     };
     [k: string]: unknown;
   } | null;
-  companyTags?: (number | Company)[] | null;
+  companyTags?: (string | Company)[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -637,11 +651,11 @@ export interface Problem {
  * via the `definition` "sessions".
  */
 export interface Session {
-  id: number;
+  id: string;
   title: string;
-  batch?: (number | null) | Batch;
-  quiz: number | Quiz;
-  host: number | User;
+  batch?: (string | null) | Batch;
+  quiz: string | Quiz;
+  host: string | User;
   status: 'WAITING' | 'ACTIVE' | 'FINISHED';
   mode: 'INTERACTIVE' | 'DIY';
   totalTimeLimit?: number | null;
@@ -669,7 +683,7 @@ export interface Session {
  * via the `definition` "feedback".
  */
 export interface Feedback {
-  id: number;
+  id: string;
   name: string;
   event: string;
   rating: number;
@@ -698,7 +712,7 @@ export interface Feedback {
  * via the `definition` "leads".
  */
 export interface Lead {
-  id: number;
+  id: string;
   name: string;
   phone?: string | null;
   source?: string | null;
@@ -722,13 +736,13 @@ export interface Lead {
  * via the `definition` "lessons".
  */
 export interface Lesson {
-  id: number;
+  id: string;
   title: string;
-  module: number | CourseModule;
+  module: string | CourseModule;
   /**
    * Select batches that can access this lesson
    */
-  batch?: (number | Batch)[] | null;
+  batch?: (string | Batch)[] | null;
   order?: number | null;
   topics?:
     | {
@@ -758,7 +772,7 @@ export interface Lesson {
               | {
                   title?: string | null;
                   videoSource?: ('bunny' | 'youtube' | 'custom') | null;
-                  video?: (number | null) | Video;
+                  video?: (string | null) | Video;
                   /**
                    * Legacy field. Use "Video" relationship for new uploads.
                    */
@@ -769,14 +783,14 @@ export interface Lesson {
                   blockType: 'videoBlock';
                 }
               | {
-                  quiz: number | Quiz;
+                  quiz: string | Quiz;
                   id?: string | null;
                   blockName?: string | null;
                   blockType: 'quizBlock';
                 }
               | {
                   title?: string | null;
-                  file: number | Media;
+                  file: string | Media;
                   id?: string | null;
                   blockName?: string | null;
                   blockType: 'pdfBlock';
@@ -787,7 +801,7 @@ export interface Lesson {
           | {
               title?: string | null;
               url?: string | null;
-              file?: (number | null) | Media;
+              file?: (string | null) | Media;
               id?: string | null;
             }[]
           | null;
@@ -802,10 +816,10 @@ export interface Lesson {
  * via the `definition` "course-progress".
  */
 export interface CourseProgress {
-  id: number;
-  user: number | User;
-  course?: (number | null) | Course;
-  lesson: number | Lesson;
+  id: string;
+  user: string | User;
+  course?: (string | null) | Course;
+  lesson: string | Lesson;
   status?: ('NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED') | null;
   completedAt?: string | null;
   updatedAt: string;
@@ -816,13 +830,13 @@ export interface CourseProgress {
  * via the `definition` "lesson-notes".
  */
 export interface LessonNote {
-  id: number;
-  user: number | User;
-  lesson: number | Lesson;
+  id: string;
+  user: string | User;
+  lesson: string | Lesson;
   /**
    * Optional: Restrict note to specific batch
    */
-  batch?: (number | null) | Batch;
+  batch?: (string | null) | Batch;
   content: {
     root: {
       type: string;
@@ -846,7 +860,7 @@ export interface LessonNote {
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
-  id: number;
+  id: string;
   key: string;
   data:
     | {
@@ -863,88 +877,88 @@ export interface PayloadKv {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: number;
+  id: string;
   document?:
     | ({
         relationTo: 'users';
-        value: number | User;
+        value: string | User;
       } | null)
     | ({
         relationTo: 'companies';
-        value: number | Company;
+        value: string | Company;
       } | null)
     | ({
         relationTo: 'media';
-        value: number | Media;
+        value: string | Media;
       } | null)
     | ({
         relationTo: 'videos';
-        value: number | Video;
+        value: string | Video;
       } | null)
     | ({
         relationTo: 'announcements';
-        value: number | Announcement;
+        value: string | Announcement;
       } | null)
     | ({
         relationTo: 'courses';
-        value: number | Course;
+        value: string | Course;
       } | null)
     | ({
         relationTo: 'batches';
-        value: number | Batch;
+        value: string | Batch;
       } | null)
     | ({
         relationTo: 'workshops';
-        value: number | Workshop;
+        value: string | Workshop;
       } | null)
     | ({
         relationTo: 'workshop-registrations';
-        value: number | WorkshopRegistration;
+        value: string | WorkshopRegistration;
       } | null)
     | ({
         relationTo: 'quizzes';
-        value: number | Quiz;
+        value: string | Quiz;
       } | null)
     | ({
         relationTo: 'daily-quizzes';
-        value: number | DailyQuizz;
+        value: string | DailyQuizz;
       } | null)
     | ({
         relationTo: 'problems';
-        value: number | Problem;
+        value: string | Problem;
       } | null)
     | ({
         relationTo: 'sessions';
-        value: number | Session;
+        value: string | Session;
       } | null)
     | ({
         relationTo: 'feedback';
-        value: number | Feedback;
+        value: string | Feedback;
       } | null)
     | ({
         relationTo: 'leads';
-        value: number | Lead;
+        value: string | Lead;
       } | null)
     | ({
         relationTo: 'course-modules';
-        value: number | CourseModule;
+        value: string | CourseModule;
       } | null)
     | ({
         relationTo: 'lessons';
-        value: number | Lesson;
+        value: string | Lesson;
       } | null)
     | ({
         relationTo: 'course-progress';
-        value: number | CourseProgress;
+        value: string | CourseProgress;
       } | null)
     | ({
         relationTo: 'lesson-notes';
-        value: number | LessonNote;
+        value: string | LessonNote;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: number | User;
+    value: string | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -954,10 +968,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: number;
+  id: string;
   user: {
     relationTo: 'users';
-    value: number | User;
+    value: string | User;
   };
   key?: string | null;
   value?:
@@ -977,7 +991,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: number;
+  id: string;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;

@@ -31,7 +31,6 @@ SERVICE="${CLOUD_RUN_SERVICE:-zoi-cms}"
 MIGRATION_JOB="${CLOUD_RUN_MIGRATION_JOB:-zoi-cms-migrate}"
 REPO_NAME="${ARTIFACT_REGISTRY_REPO:-zoi-cms-repo}"
 IMAGE_NAME="${DOCKER_IMAGE_NAME:-payload-cms}"
-SQL_INSTANCE="${CLOUD_SQL_INSTANCE:-nuatlabs:asia-south1:zoi-sql}"
 
 # Derived variables
 IMAGE_TAG="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${IMAGE_NAME}:latest"
@@ -73,7 +72,6 @@ echo "   Region:           ${REGION}"
 echo "   Service:          ${SERVICE}"
 echo "   Migration Job:    ${MIGRATION_JOB}"
 echo "   Image Tag:        ${IMAGE_TAG}"
-echo "   SQL Instance:     ${SQL_INSTANCE}"
 echo ""
 
 # Confirm deployment (skip if CI is set)
@@ -105,7 +103,6 @@ echo -e "${BLUE}🔄 Step 2/4: Deploying migration job...${NC}"
 gcloud run jobs deploy "${MIGRATION_JOB}" \
   --image "${IMAGE_TAG}" \
   --region "${REGION}" \
-  --set-cloudsql-instances="${SQL_INSTANCE}" \
   --set-env-vars "DATABASE_URL=${DATABASE_URL},PAYLOAD_SECRET=${PAYLOAD_SECRET},NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts,PAYLOAD_PUBLIC_SERVER_URL=${FINAL_SERVER_URL}" \
   --max-retries 0 \
   --task-timeout 10m \
@@ -154,7 +151,6 @@ gcloud run deploy "${SERVICE}" \
   --platform managed \
   --region "${REGION}" \
   --allow-unauthenticated \
-  --add-cloudsql-instances="${SQL_INSTANCE}" \
   --set-env-vars "DATABASE_URL=${DATABASE_URL},PAYLOAD_SECRET=${PAYLOAD_SECRET},NODE_ENV=production,PAYLOAD_CONFIG_PATH=src/payload.config.ts,PAYLOAD_PUBLIC_SERVER_URL=${FINAL_SERVER_URL},BUNNY_API_KEY=${BUNNY_API_KEY},BUNNY_LIBRARY_ID=${BUNNY_LIBRARY_ID},BUNNY_CDN_HOSTNAME=${BUNNY_CDN_HOSTNAME}" \
   --memory 2Gi \
   --cpu 2 \
