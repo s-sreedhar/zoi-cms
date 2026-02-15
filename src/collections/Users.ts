@@ -5,7 +5,13 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: 'displayName',
   },
+  access: {
+    read: () => true,
+  },
   auth: true,
+  endpoints: [
+
+  ],
   hooks: {
     afterLogin: [
       async ({ req, user }) => {
@@ -59,6 +65,13 @@ export const Users: CollectionConfig = {
 
     {
       name: 'imageUrl',
+      type: 'text',
+      admin: {
+        readOnly: true,
+      },
+    },
+    {
+      name: 'googleId',
       type: 'text',
       admin: {
         readOnly: true,

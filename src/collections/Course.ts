@@ -7,6 +7,9 @@ export const Course: CollectionConfig = {
     admin: {
         useAsTitle: 'title',
     },
+    access: {
+        read: () => true,
+    },
     fields: [
         {
             name: 'title',

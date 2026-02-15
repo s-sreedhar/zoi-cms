@@ -61,6 +61,15 @@ export const Workshop: CollectionConfig = {
             required: true,
         },
         {
+            name: 'venue',
+            type: 'text',
+            required: true,
+            defaultValue: 'Online',
+            admin: {
+                position: 'sidebar',
+            },
+        },
+        {
             name: 'endDate',
             type: 'date',
         },
@@ -75,6 +84,7 @@ export const Workshop: CollectionConfig = {
             admin: {
                 position: 'sidebar',
             },
+            required: true,
         },
         {
             name: 'images',

@@ -25,6 +25,7 @@ import { Lesson } from './collections/Lesson'
 import { CourseProgress } from './collections/CourseProgress'
 import { Announcement } from './collections/Announcement'
 import { LessonNotes } from './collections/LessonNotes'
+import { WorkshopRegistration } from './collections/WorkshopRegistration'
 import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
@@ -64,7 +65,7 @@ export default buildConfig({
       },
     },
   },
-  collections: [Users, Company, Media, Videos, Announcement, Course, Batch, Workshop, Quiz, DailyQuiz, Problem, Session, Feedback, Leads, CourseModule, Lesson, CourseProgress, LessonNotes],
+  collections: [Users, Company, Media, Videos, Announcement, Course, Batch, Workshop, WorkshopRegistration, Quiz, DailyQuiz, Problem, Session, Feedback, Leads, CourseModule, Lesson, CourseProgress, LessonNotes],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

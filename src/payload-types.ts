@@ -75,6 +75,7 @@ export interface Config {
     courses: Course;
     batches: Batch;
     workshops: Workshop;
+    'workshop-registrations': WorkshopRegistration;
     quizzes: Quiz;
     'daily-quizzes': DailyQuizz;
     problems: Problem;
@@ -100,6 +101,7 @@ export interface Config {
     courses: CoursesSelect<false> | CoursesSelect<true>;
     batches: BatchesSelect<false> | BatchesSelect<true>;
     workshops: WorkshopsSelect<false> | WorkshopsSelect<true>;
+    'workshop-registrations': WorkshopRegistrationsSelect<false> | WorkshopRegistrationsSelect<true>;
     quizzes: QuizzesSelect<false> | QuizzesSelect<true>;
     'daily-quizzes': DailyQuizzesSelect<false> | DailyQuizzesSelect<true>;
     problems: ProblemsSelect<false> | ProblemsSelect<true>;
@@ -157,6 +159,7 @@ export interface User {
   phoneNumber?: string | null;
   batch?: (number | null) | Batch;
   imageUrl?: string | null;
+  googleId?: string | null;
   streak?: number | null;
   points?: number | null;
   lastQuizDate?: string | null;
@@ -204,7 +207,7 @@ export interface Batch {
   originalPrice?: number | null;
   offerTitle?: string | null;
   offerDetails?: string | null;
-  instructors?: (number | User)[] | null;
+  instructors: (number | User)[];
   hidden?: boolean | null;
   syllabus?: {
     root: {
@@ -361,8 +364,9 @@ export interface Workshop {
   slug: string;
   description: string;
   startDate: string;
+  venue: string;
   endDate?: string | null;
-  instructors?: (number | User)[] | null;
+  instructors: (number | User)[];
   images?:
     | {
         image?: (number | null) | Media;
@@ -375,6 +379,21 @@ export interface Workshop {
         id?: string | null;
       }[]
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "workshop-registrations".
+ */
+export interface WorkshopRegistration {
+  id: number;
+  name: string;
+  rollNumber: string;
+  email: string;
+  howDidYouKnow: 'social_media' | 'friend' | 'college' | 'other';
+  workshop: number | Workshop;
+  venue?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -879,6 +898,10 @@ export interface PayloadLockedDocument {
         value: number | Workshop;
       } | null)
     | ({
+        relationTo: 'workshop-registrations';
+        value: number | WorkshopRegistration;
+      } | null)
+    | ({
         relationTo: 'quizzes';
         value: number | Quiz;
       } | null)
@@ -970,6 +993,7 @@ export interface UsersSelect<T extends boolean = true> {
   phoneNumber?: T;
   batch?: T;
   imageUrl?: T;
+  googleId?: T;
   streak?: T;
   points?: T;
   lastQuizDate?: T;
@@ -1114,6 +1138,7 @@ export interface WorkshopsSelect<T extends boolean = true> {
   slug?: T;
   description?: T;
   startDate?: T;
+  venue?: T;
   endDate?: T;
   instructors?: T;
   images?:
@@ -1128,6 +1153,20 @@ export interface WorkshopsSelect<T extends boolean = true> {
         pdf?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "workshop-registrations_select".
+ */
+export interface WorkshopRegistrationsSelect<T extends boolean = true> {
+  name?: T;
+  rollNumber?: T;
+  email?: T;
+  howDidYouKnow?: T;
+  workshop?: T;
+  venue?: T;
   updatedAt?: T;
   createdAt?: T;
 }

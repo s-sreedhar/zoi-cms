@@ -115,6 +115,7 @@ export const Batch: CollectionConfig = {
             filterOptions: {
                 role: { in: ['instructor', 'admin', 'superadmin'] },
             },
+            required: true,
         },
         {
             name: 'hidden',
